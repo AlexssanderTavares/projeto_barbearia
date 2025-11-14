@@ -1,0 +1,57 @@
+--CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+
+CREATE TABLE IF NOT EXISTS Endereco(
+	cep VARCHAR(9) PRIMARY KEY NOT NULL,
+	cidade TEXT NOT NULL,
+	estado TEXT NOT NULL,
+	bairro TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Filial(
+	ID_filial UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	nome TEXT NOT NULL,
+	pass VARCHAR(8) NOT NULL,
+	email TEXT UNIQUE NOT NULL,
+	cnpj VARCHAR(14) UNIQUE NOT NULL,
+	qtd_profissionais INT DEFAULT 0,
+	telefone TEXT[],
+	endereco VARCHAR(9) NOT NULL REFERENCES Endereco(cep)
+);
+
+CREATE TABLE IF NOT EXISTS Cliente(
+	ID_cliente UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	nome TEXT NOT NULL,
+	email TEXT UNIQUE NOT NULL,
+	pass TEXT NOT NULL,
+	telefone TEXT[],
+	endereco VARCHAR(9) NOT NULL REFERENCES Endereco(cep)
+);
+
+CREATE TABLE IF NOT EXISTS Profissional(
+	ID_prof UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	ID_filial UUID NOT NULL REFERENCES Filial(ID_filial),
+	nome TEXT NOT NULL,
+	email TEXT UNIQUE NOT NULL,
+	telefone TEXT[]
+);
+
+CREATE TABLE IF NOT EXISTS OrdemServico(
+	ID_os BIGSERIAL PRIMARY KEY NOT NULL,
+	ID_cliente UUID NOT NULL REFERENCES Cliente(ID_cliente),
+	ID_prof UUID NOT NULL REFERENCES Profissional(ID_prof),
+	agendamento TIMESTAMP NOT NULL,
+	subtotal MONEY DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS TipoServico(
+	ID_servico BIGSERIAL PRIMARY KEY NOT NULL,
+	nome TEXT NOT NULL,
+	duracao INT NOT NULL, --tempo em minutos, formato ex: 40min 
+	preco MONEY NOT NULL,
+	qt_servico INT DEFAULT 0,
+	ID_cliente UUID NOT NULL REFERENCES Cliente(ID_cliente),
+	ID_os BIGINT NOT NULL REFERENCES OrdemServico(ID_os)
+);
+
+

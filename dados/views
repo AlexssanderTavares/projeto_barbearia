@@ -1,0 +1,37 @@
+CREATE OR REPLACE VIEW Endereco_Cliente AS
+	SELECT nome, email, telefone, cep, cidade, estado, bairro FROM endereco
+	INNER JOIN cliente
+		ON endereco = cliente.endereco;
+
+CREATE OR REPLACE VIEW Endereco_Filial AS
+	SELECT nome, cnpj, telefone AS Contatos, qtd_profissionais AS QuantidadeDeProfissionais, cep, cidade, estado, bairro FROM endereco
+	INNER JOIN filial
+		ON endereco = filial.endereco;
+
+CREATE OR REPLACE VIEW Profissional_Por_Filial AS
+	SELECT profissional.nome AS NomeProfissional, profissional.email, profissional.telefone AS ContatosProfissinal, filial.nome AS NomeFilial, filial.telefone AS ContatoFilial FROM filial
+	INNER JOIN profissional
+		ON filial.id_filial = profissional.id_filial;
+
+CREATE OR REPLACE VIEW Servico_Por_Cliente AS
+	SELECT cliente.nome AS NomeCLiente, cliente.telefone AS ContatoCliente, cliente.email AS EmailCliente,
+	tiposervico.id_servico AS CodigoServico, tiposervico.nome AS NomeServico, duracao, preco, qt_servico AS QuantidadeSolicitada
+	FROM cliente
+	INNER JOIN tiposervico
+		ON cliente.id_cliente = tiposervico.id_cliente;
+
+CREATE OR REPLACE VIEW Agendamento AS
+	SELECT ordemservico.id_os AS NumeroDoPedido, cliente.nome AS ClienteSolicitante, profissional.nome AS Barbeiro,
+	tiposervico.nome AS servico, SUM(tiposervico.duracao) AS TempoTotalEstimado, SUM(tiposervico.preco) AS Subtotal, ordemservico.agendamento FROM ordemservico
+	INNER JOIN cliente
+		ON ordemservico.id_cliente = cliente.id_cliente
+	INNER JOIN profissional
+		ON ordemservico.id_prof = profissional.id_prof
+	INNER JOIN tiposervico
+		ON ordemservico.id_os = tiposervico.id_os
+	GROUP BY ordemservico.id_os, cliente.nome, profissional.nome, tiposervico.nome;
+
+
+
+
+
