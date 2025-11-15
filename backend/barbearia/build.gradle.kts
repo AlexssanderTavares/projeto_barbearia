@@ -12,7 +12,7 @@ description = "Back-end da barbearia"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -24,6 +24,7 @@ repositories {
 dependencies {
     val dotenvVersion: String = "0.0.2"
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
