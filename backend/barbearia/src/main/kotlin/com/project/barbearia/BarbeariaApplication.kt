@@ -1,5 +1,6 @@
 package com.project.barbearia
 
+import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -7,5 +8,7 @@ import org.springframework.boot.runApplication
 class BarbeariaApplication
 
 fun main(args: Array<String>) {
+
+    Dotenv.configure().directory("src/main/resources/").filename(".env").load()
 	runApplication<BarbeariaApplication>(*args)
 }
