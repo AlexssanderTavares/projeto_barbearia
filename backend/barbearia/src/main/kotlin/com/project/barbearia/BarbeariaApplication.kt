@@ -9,6 +9,7 @@ class BarbeariaApplication
 
 fun main(args: Array<String>) {
 
-    Dotenv.configure().directory("src/main/resources/").filename(".env").load()
+    /*** Remova o comentário em caso de ser necessário um arquivo .env */
+    //Dotenv.configure().directory("src/main/resources/").filename(".env").load()
 	runApplication<BarbeariaApplication>(*args)
 }

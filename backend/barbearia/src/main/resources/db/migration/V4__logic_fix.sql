@@ -1,0 +1,1 @@
+ALTER TABLE tiposervico ALTER COLUMN preco TYPE NUMERIC(19,2);
