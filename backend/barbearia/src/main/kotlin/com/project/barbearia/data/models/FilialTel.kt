@@ -1,5 +1,6 @@
 package com.project.barbearia.data.models
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -13,9 +14,12 @@ data class FilialTel(
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "id")
     val id: Int,
 
+    @Column(name = "filial")
     val filialId: UUID,
 
-    val tel: Tel
+    @Column(name = "telefone")
+    val tel: String
 )

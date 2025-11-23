@@ -1,6 +1,9 @@
 package com.project.barbearia.data.models
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.util.UUID
@@ -11,12 +14,25 @@ import java.util.UUID
 data class Filial(
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_filial")
     val id: UUID,
+
+    @Column(name = "cnpj")
     val cnpj: String,
+
+    @Column(name = "nome")
     val name: String,
+
+    @Column(name = "email")
     val email: String,
+
+    @Column(name = "pass")
     val pass: String,
+
+    @Column(name = "qtd_profissionais")
     var qt_prof: Int = 0,
-    val tel: ArrayList<String?>,
+
+    @Column(name = "endereco")
     val cep: String
     )

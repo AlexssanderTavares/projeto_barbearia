@@ -1,5 +1,6 @@
 package com.project.barbearia.data.models
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -14,9 +15,16 @@ import java.util.UUID
 data class OrdemServico(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_os")
     val os: Int,
+
+    @Column(name = "id_cliente")
     val idClient: UUID,
+
+    @Column(name = "id_prof")
     val idProf: UUID,
+
+    @Column(name = "agendamento")
     val date: Timestamp
 )
