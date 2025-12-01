@@ -15,10 +15,10 @@ data class Cliente(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_cliente")
-    val id: UUID,
+    val id: UUID?,
 
     @Column(name = "nome")
-    val name: String,
+    val name: String?,
 
     @Column(name = "email")
     val email: String,
@@ -27,5 +27,5 @@ data class Cliente(
     val pass: String,
 
     @Column(name = "endereco")
-    val cep: String
+    val cep: String?
 )
