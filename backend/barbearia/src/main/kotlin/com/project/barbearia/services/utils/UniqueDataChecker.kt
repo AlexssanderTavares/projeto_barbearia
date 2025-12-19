@@ -57,4 +57,20 @@ class UniqueDataChecker() {
             res
         }
     }
+
+    fun verifyBusinessCode(code: String): Boolean{
+        var res: Boolean = false
+        val scope: Job = CoroutineScope(Dispatchers.Unconfined).launch {
+            if(code.length == 14 && code.contains(Regex("[0-9]"))){
+                res = true
+            }
+        }
+
+        scope.start()
+        return if(scope.isCompleted){
+            res
+        } else {
+            res
+        }
+    }
 }

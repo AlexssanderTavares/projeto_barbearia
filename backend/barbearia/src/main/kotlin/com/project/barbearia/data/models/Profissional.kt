@@ -1,5 +1,6 @@
 package com.project.barbearia.data.models
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -12,11 +13,17 @@ import java.util.UUID
 data class Profissional(
 
     @Id
+    @Column(name = "id_prof")
     @GeneratedValue(strategy = GenerationType.UUID)
-    val idProf: UUID,
+    val id: UUID,
 
+    @Column(name = "id_filial")
     val idFilial: UUID,
+
+    @Column(name = "nome")
     val name: String,
+
+    @Column(name = "email")
     val email: String,
 
 )

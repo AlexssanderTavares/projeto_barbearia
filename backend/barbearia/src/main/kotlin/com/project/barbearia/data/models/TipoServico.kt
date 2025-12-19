@@ -29,8 +29,5 @@ data class TipoServico(
     val price: BigDecimal,
 
     @Column(name = "qt_servico")
-    val quantity: Int,
-
-    @Column(name = "id_cliente")
-    val client: UUID
+    val quantity: Int
 )

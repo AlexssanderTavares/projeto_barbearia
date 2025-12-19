@@ -13,7 +13,7 @@ import java.math.BigDecimal
 data class ServicoView(
     @Id
     @Column(name = "id_servico")
-    val IdServico: Int,
+    val id: Int,
 
     @Column(name = "nome")
     val nome: String,

@@ -2,7 +2,7 @@ package com.project.barbearia.controllers
 
 import com.project.barbearia.data.models.Cliente
 import com.project.barbearia.data.repositories.ClienteRepository
-import com.project.barbearia.services.cliente.ClientService
+import com.project.barbearia.services.ClientService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.data.repository.findByIdOrNull

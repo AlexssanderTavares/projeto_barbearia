@@ -13,7 +13,7 @@ import java.util.UUID
 data class FilialView(
     @Id
     @Column(name = "id_filial")
-    val IdFilial: UUID,
+    val id: UUID,
 
     @Column(name = "nome")
     val name: String,

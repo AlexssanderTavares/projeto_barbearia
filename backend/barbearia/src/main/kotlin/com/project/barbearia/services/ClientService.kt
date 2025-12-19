@@ -1,8 +1,9 @@
-package com.project.barbearia.services.cliente
+package com.project.barbearia.services
 
 import com.project.barbearia.data.models.Cliente
 import com.project.barbearia.data.models.views.ClientView
 import com.project.barbearia.data.repositories.ClienteRepository
+import com.project.barbearia.data.repositories.ClienteViewRepository
 import com.project.barbearia.services.utils.UniqueDataChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -13,29 +14,21 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.Optional
+import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 
 @Service
-class ClientService(@Autowired val repository: ClienteRepository, @Autowired val viewService: ClienteViewService) {
-
-    init{
-        this.loadClients()
-    }
+class ClientService(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository) {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
 
-    lateinit var clientList: List<ClientView>
-
-    fun loadClients() {
-        this.clientList = viewService.getAll()
-    }
-
-    fun create(cliente: Cliente) : Int {
+    fun create(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
 
             val res1: Deferred<Boolean> = async {
-                checker.verifyEmail(cliente.email)
+                checker.verifyEmail(cliente.email) && getByEmail(cliente.email).isEmpty
             }
 
             val res2: Deferred<Boolean> = async {
@@ -46,11 +39,10 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
                 checker.verifyPostalCode(cliente.cep!!)
             }
 
-            if(res1.await() && res2.await() && res3.await()){
-                repository.save(cliente)
-                repository.flush()
-                res++
-                loadClients()
+            if (res1.await() && res2.await() && res3.await()) {
+                repo.save(cliente)
+                repo.flush()
+                res = 1
             } else {
                 when {
                     !res1.await() -> {
@@ -62,6 +54,7 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
                         )
                         res = -1
                     }
+
                     !res2.await() -> {
                         coroutineContext.cancel(
                             CancellationException(
@@ -71,6 +64,7 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
                         )
                         res = -1
                     }
+
                     !res3.await() -> {
                         coroutineContext.cancel(
                             CancellationException(
@@ -86,50 +80,62 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
 
         scope.start()
 
-        return if(scope.isCompleted){
-            res
-        }else if(scope.isCancelled){
-            res
-        } else {
-            0
+        return when{
+            scope.isCompleted -> res
+            scope.isCancelled -> res
+            else -> 0
         }
     }
 
-    fun delete(cliente: Cliente) : Int {
+    fun getById(id: UUID): Optional<ClientView> {
+        return viewRepo.findById(id)
+    }
+
+    fun getByEmail(email: String): Optional<ClientView> {
+        return viewRepo.findByEmail(email)
+    }
+
+    fun getAll(): List<ClientView> {
+        return viewRepo.findAll()
+    }
+
+    fun delete(cliente: Cliente): Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {
-                repository.delete(cliente)
-                repository.flush()
-                loadClients()
-                res += 1
+                if (cliente == getByEmail(cliente.email) || cliente.id == getById(cliente.id!!)) {
+                    repo.delete(cliente)
+                    repo.flush()
+                    res += 1
+                }
             } catch (e: IllegalArgumentException) {
                 res = -1
-                coroutineContext.cancel()
+                coroutineContext.cancel(CancellationException("Argumento inválido na chamada do método delete"))
+            } catch (e: NoSuchElementException) {
+                res = -1
+                coroutineContext.cancel(CancellationException("Registro não existe"))
             }
         }
 
         scope.start()
-        return if(scope.isCompleted){
-            res
-        } else if(scope.isCancelled) {
-            res
-        } else {
-            0
+        return when{
+            scope.isCompleted -> res
+            scope.isCancelled -> res
+            else -> 0
         }
     }
 
     fun updatePass(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
-            try{
-                val cl: Cliente = repository.findById(cliente.id!!).orElseThrow()
-
-                if(cliente.pass != cl.pass){
-                    repository.save(cliente)
-                    repository.flush()
-                    loadClients()
+            try {
+                if ((cliente == getByEmail(cliente.email) || cliente == getById(cliente.id!!)) && cliente.pass != repo.findById(
+                        cliente.id!!
+                    ).get().pass
+                ) {
+                    repo.save(cliente)
+                    repo.flush()
                     res += 1
                 }
             } catch (e: IllegalArgumentException) {
@@ -143,23 +149,23 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
 
         scope.start()
 
-        return if(scope.isCompleted){
-            res
-        } else {
-            res
+        return when{
+            scope.isCompleted -> res
+            scope.isCancelled -> res
+            else -> 0
         }
     }
 
     fun updateEmail(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
-            try{
-                val cl: Cliente = repository.findById(cliente.id!!).orElseThrow()
-
-                if(cliente.email != cl.email){
-                    repository.save(cliente)
-                    repository.flush()
-                    loadClients()
+            try {
+                if ((cliente == getByEmail(cliente.email) || cliente == getById(cliente.id!!)) && cliente.pass != repo.findById(
+                        cliente.id!!
+                    ).get().pass
+                ) {
+                    repo.save(cliente)
+                    repo.flush()
                     res += 1
                 }
             } catch (e: IllegalArgumentException) {
@@ -173,23 +179,23 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
 
         scope.start()
 
-        return if(scope.isCompleted){
-            res
-        } else {
-            res
+        return when{
+            scope.isCompleted -> res
+            scope.isCancelled -> res
+            else -> 0
         }
     }
 
     fun updateCep(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
-            try{
-                val cl: Cliente = repository.findById(cliente.id!!).orElseThrow()
-
-                if(cliente.cep != cl.cep){
-                    repository.save(cliente)
-                    repository.flush()
-                    loadClients()
+            try {
+                if ((cliente == getByEmail(cliente.email) || cliente == getById(cliente.id!!)) && cliente.pass != repo.findById(
+                        cliente.id!!
+                    ).get().pass
+                ) {
+                    repo.save(cliente)
+                    repo.flush()
                     res += 1
                 }
             } catch (e: IllegalArgumentException) {
@@ -203,10 +209,10 @@ class ClientService(@Autowired val repository: ClienteRepository, @Autowired val
 
         scope.start()
 
-        return if(scope.isCompleted){
-            res
-        } else {
-            res
+        return when{
+            scope.isCompleted -> res
+            scope.isCancelled -> res
+            else -> 0
         }
     }
 

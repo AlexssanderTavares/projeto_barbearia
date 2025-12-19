@@ -14,7 +14,7 @@ data class ProfissionalView(
 
     @Id
     @Column(name = "id_prof")
-    val IdProf: UUID,
+    val id: UUID,
 
     @Column(name = "nome")
     val nome: String,
