@@ -1,18 +1,13 @@
 package com.project.barbearia.controllers
 
 import com.project.barbearia.data.models.Cliente
-import com.project.barbearia.data.repositories.ClienteRepository
-import com.project.barbearia.services.ClientService
+import com.project.barbearia.services.implementations.ClientServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -20,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/cli")
 class ClientController(
     @Autowired
-    private val service: ClientService
+    private val service: ClientServiceImpl
 ) {
     /*private val list: MutableList<Cliente> = repository.findAll()*/
     /*** Função que cria um novo cliente, a partir do preenchimento de um formulário de cadastro do

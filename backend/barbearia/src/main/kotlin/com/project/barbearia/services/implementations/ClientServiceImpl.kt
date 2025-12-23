@@ -1,9 +1,10 @@
-package com.project.barbearia.services
+package com.project.barbearia.services.implementations
 
 import com.project.barbearia.data.models.Cliente
 import com.project.barbearia.data.models.views.ClientView
 import com.project.barbearia.data.repositories.ClienteRepository
 import com.project.barbearia.data.repositories.ClienteViewRepository
+import com.project.barbearia.services.abstracts.ClientService
 import com.project.barbearia.services.utils.UniqueDataChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -19,11 +20,11 @@ import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 
 @Service
-class ClientService(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository) {
+class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository): ClientService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
 
-    fun create(cliente: Cliente): Int {
+    override fun create(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
 
@@ -87,19 +88,19 @@ class ClientService(@Autowired private val repo: ClienteRepository, @Autowired p
         }
     }
 
-    fun getById(id: UUID): Optional<ClientView> {
+    override fun getById(id: UUID): Optional<ClientView> {
         return viewRepo.findById(id)
     }
 
-    fun getByEmail(email: String): Optional<ClientView> {
+    override fun getByEmail(email: String): Optional<ClientView> {
         return viewRepo.findByEmail(email)
     }
 
-    fun getAll(): List<ClientView> {
+    override fun getAll(): List<ClientView> {
         return viewRepo.findAll()
     }
 
-    fun delete(cliente: Cliente): Int {
+    override fun delete(cliente: Cliente): Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
@@ -126,7 +127,7 @@ class ClientService(@Autowired private val repo: ClienteRepository, @Autowired p
         }
     }
 
-    fun updatePass(cliente: Cliente): Int {
+    override fun updatePass(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -156,7 +157,7 @@ class ClientService(@Autowired private val repo: ClienteRepository, @Autowired p
         }
     }
 
-    fun updateEmail(cliente: Cliente): Int {
+    override fun updateEmail(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -186,7 +187,7 @@ class ClientService(@Autowired private val repo: ClienteRepository, @Autowired p
         }
     }
 
-    fun updateCep(cliente: Cliente): Int {
+    override fun updateCep(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {

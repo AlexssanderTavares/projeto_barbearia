@@ -21,5 +21,4 @@ data class associacao_os_servico(
 
     @Column(name = "id_tiposervico")
     val idTipoServico: Int,
-
-    )
+)

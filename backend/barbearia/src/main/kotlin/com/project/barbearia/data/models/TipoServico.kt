@@ -26,8 +26,11 @@ data class TipoServico(
     val duration: Int, /*** Duração em valor inteiro que corresponde aos minutos */
 
     @Column(name = "preco")
-    val price: BigDecimal,
+    var price: BigDecimal = BigDecimal.ZERO,
 
     @Column(name = "qt_servico")
-    val quantity: Int
+    val quantity: Int,
+
+    @Column(name = "descricao")
+    val description: String
 )

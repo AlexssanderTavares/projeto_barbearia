@@ -1,9 +1,10 @@
-package com.project.barbearia.services
+package com.project.barbearia.services.implementations
 
 import com.project.barbearia.data.models.Filial
 import com.project.barbearia.data.models.views.FilialView
 import com.project.barbearia.data.repositories.FilialRepository
 import com.project.barbearia.data.repositories.FilialViewRepository
+import com.project.barbearia.services.abstracts.FilialService
 import com.project.barbearia.services.utils.UniqueDataChecker
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -17,11 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.Optional
 import java.util.UUID
 
-class FilialService(@Autowired private val repo: FilialRepository, @Autowired private val viewRepo: FilialViewRepository) {
+class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowired private val viewRepo: FilialViewRepository): FilialService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
 
-    fun create(filial: Filial): Int {
+    override fun create(filial: Filial): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
 
@@ -73,7 +74,7 @@ class FilialService(@Autowired private val repo: FilialRepository, @Autowired pr
 
                     !res4.await() -> {
                         coroutineContext.cancel(
-                            kotlin.coroutines.cancellation.CancellationException(
+                            CancellationException(
                                 "Entrada de cep inválida",
                                 IllegalArgumentException()
                             )
@@ -92,23 +93,23 @@ class FilialService(@Autowired private val repo: FilialRepository, @Autowired pr
         }
     }
 
-    fun getById(id: UUID): Optional<FilialView> {
+    override fun getById(id: UUID): Optional<FilialView> {
         return viewRepo.findById(id)
     }
 
-    fun getByCnpj(cnpj: String): Optional<FilialView> {
+    override fun getByCnpj(cnpj: String): Optional<FilialView> {
         return viewRepo.findByCnpj(cnpj)
     }
 
-    fun getByEmail(email: String): Optional<FilialView> {
+    override fun getByEmail(email: String): Optional<FilialView> {
         return viewRepo.findByEmail(email)
     }
 
-    fun getAll(): List<FilialView> {
+    override fun getAll(): List<FilialView> {
         return viewRepo.findAll()
     }
 
-    fun delete(filial: Filial): Int {
+    override fun delete(filial: Filial): Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
@@ -134,7 +135,7 @@ class FilialService(@Autowired private val repo: FilialRepository, @Autowired pr
         }
     }
 
-    fun updateQuantity(filial: Filial, quantity: Int): Int {
+    override fun updateQuantity(filial: Filial, quantity: Int): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {

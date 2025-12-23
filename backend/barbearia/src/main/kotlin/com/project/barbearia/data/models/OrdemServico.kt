@@ -26,5 +26,8 @@ data class OrdemServico(
     val idProf: UUID,
 
     @Column(name = "agendamento")
-    val date: Timestamp
+    val date: Timestamp,
+
+    @Column(name = "status")
+    val status: String
 )

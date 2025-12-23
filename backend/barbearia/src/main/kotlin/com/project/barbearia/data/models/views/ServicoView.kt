@@ -16,14 +16,14 @@ data class ServicoView(
     val id: Int,
 
     @Column(name = "nome")
-    val nome: String,
+    val name: String,
 
     @Column(name = "duracao")
-    val duracao: Int,
+    val duration: Int,
 
     @Column(name = "preco")
-    val preco: BigDecimal,
+    val price: BigDecimal,
 
     @Column(name = "descricao")
-    val descricao: String
+    val description: String
 )
