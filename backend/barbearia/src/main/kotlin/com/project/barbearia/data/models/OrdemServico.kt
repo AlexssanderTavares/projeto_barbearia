@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 
@@ -17,7 +18,7 @@ data class OrdemServico(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_os")
-    val os: Int,
+    val os: Long,
 
     @Column(name = "id_cliente")
     val idClient: UUID,
@@ -26,7 +27,7 @@ data class OrdemServico(
     val idProf: UUID,
 
     @Column(name = "agendamento")
-    val date: Timestamp,
+    val date: LocalDateTime,
 
     @Column(name = "status")
     val status: String

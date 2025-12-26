@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     val dotenvVersion: String = "0.0.2"
+	val dateTimeVersion: String = "0.4.0"
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -34,6 +35,7 @@ dependencies {
     implementation("com.github.dotenv-org:dotenv-vault-kotlin:${dotenvVersion}")
     implementation("org.postgresql:postgresql")
 	//runtimeOnly("org.postgresql:postgresql")
+	implementation("org.jetbrains.kotlinx:kotlinx-datetime:${dateTimeVersion}")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
