@@ -1,4 +1,3 @@
-ALTER TABLE profissional DROP COLUMN name;
 ALTER TABLE tiposervico DROP COLUMN id_cliente;
 ALTER TABLE tiposervico DROP COLUMN qt_servico;
 ALTER TABLE tiposervico ADD COLUMN descricao TEXT NOT NULL;
