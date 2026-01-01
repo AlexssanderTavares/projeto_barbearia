@@ -4,37 +4,41 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.LocalDateTime
 import org.hibernate.annotations.Immutable
 import java.math.BigDecimal
+import java.util.UUID
 
 @Immutable
 @Entity
-@Table(name = "servico_solicitado")
-data class servico_solicitado(
+@Table(name = "agendamento")
+data class Agendamento(
 
     @Id
-    @Column(name = "id_assoc")
+    @Column(name = "id_os")
     val id: Int,
 
-    @Column(name = "agendamento")
-    val agendamento: String,
+    @Column(name = "data")
+    val data: LocalDateTime,
 
-    @Column(name = "nome")
-    val nome: String,
+    @Column(name = "status")
+    val status: String,
 
-    @Column(name = "duracao")
-    val duracao: String,
+    @Column(name = "cod_cliente")
+    val codCliente: UUID,
 
-    @Column(name = "valor_unitario")
-    val valorUnit: BigDecimal,
+    @Column(name = "cliente")
+    val nomeCliente: String,
 
-    @Column(name = "qt_solicitado")
-    val qtSolicitado: Int,
+    @Column(name = "email_cliente")
+    val emailCliente: String,
+
+    @Column(name = "profissional")
+    val nameProf: String,
+
+    @Column(name = "final_duration")
+    val duracaoFinal: Int,
 
     @Column(name = "subtotal")
-    val subtotal: BigDecimal,
-
-    @Column(name = "duracao_final")
-    val duracaoFinal: Int
-
+    val subtotal: BigDecimal
 )
