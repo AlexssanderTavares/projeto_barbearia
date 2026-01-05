@@ -4,6 +4,7 @@ plugins {
 	id("org.springframework.boot") version "3.5.7"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "1.9.25"
+	id("org.flywaydb.flyway") version "11.20.0"
 }
 
 group = "com.project"
@@ -18,6 +19,7 @@ java {
 
 repositories {
 	mavenCentral()
+	gradlePluginPortal()
     maven { url = uri("https://jitpack.io") }
 }
 
@@ -32,6 +34,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-database-postgresql")
+	implementation("org.flywaydb.flyway:org.flywaydb.flyway.gradle.plugin:11.20.0")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.github.dotenv-org:dotenv-vault-kotlin:${dotenvVersion}")
     implementation("org.postgresql:postgresql")
@@ -41,6 +44,17 @@ dependencies {
 	testImplementation("com.h2database:h2:${h2Version}")
 	runtimeOnly("com.h2database:h2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+apply(plugin = "org.flywaydb.flyway")
+
+flyway {
+	val address: String? = System.getenv("PSQL_URL")
+	val usr: String? = System.getenv("PSQL_USER")
+	val pswd: String? = System.getenv("PSQL_PASS")
+	url = address ?: "jdbc:postgresql://localhost:5432/projeto_barbearia"
+	user = usr ?: "alexssander"
+	password = pswd ?: "@Boomer7296"
 }
 
 kotlin {
