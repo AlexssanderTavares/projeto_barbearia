@@ -18,7 +18,7 @@ data class Cliente(
     val id: UUID?,
 
     @Column(name = "nome")
-    val name: String?,
+    val name: String,
 
     @Column(name = "email")
     val email: String,

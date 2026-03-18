@@ -1,29 +1,21 @@
-package com.example.projeto_barbearia
+package com.example.projeto_barbearia.integration.services
 
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
-import com.github.dockerjava.api.command.InspectContainerResponse
+import com.example.projeto_barbearia.data.DTOs.Cliente.ClienteCreationDTO
 import com.project.barbearia.data.models.Cliente
 import com.project.barbearia.data.repositories.ClienteRepository
 import com.project.barbearia.data.repositories.ClienteViewRepository
-import com.project.barbearia.services.abstracts.ClientService
 import com.project.barbearia.services.implementations.ClientServiceImpl
-import org.aspectj.lang.annotation.After
-import org.aspectj.lang.annotation.Before
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.testcontainers.containers.ContainerState
-import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
-
 
 @Import(TestcontainersConfiguration::class)
 @Testcontainers
@@ -54,8 +46,15 @@ class ClienteServiceTest {
     }
 
     @Test
-    fun tryCreateClientUsingFakeClientInstance() {
+    fun tryCreateClientUsingFakeClientInstanceAndReturnSuccess() {
         val cliente: Cliente = Cliente(null, "TesteDummy", "dummy@test.com", "anypass12345", "12345-678")
+        assertEquals(1, clientService.create(cliente))
+    }
+
+    @Test
+    fun tryCreateClientUsingCreationDTOAndReturnSuccess(){
+        val dto: ClienteCreationDTO = ClienteCreationDTO("Dummy", "dummy@test.com", "123dummy")
+        val cliente: Cliente = Cliente(null, dto.name, dto.email, dto.pass, null)
         assertEquals(1, clientService.create(cliente))
     }
 

@@ -1,5 +1,6 @@
 package com.project.barbearia.services.implementations
 
+import com.example.projeto_barbearia.services.utils.PasswordPatternVerifier
 import com.project.barbearia.data.models.Filial
 import com.project.barbearia.data.models.views.FilialView
 import com.project.barbearia.data.repositories.FilialRepository
@@ -21,6 +22,7 @@ import java.util.UUID
 class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowired private val viewRepo: FilialViewRepository): FilialService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
+    private val pswdVerifier: PasswordPatternVerifier = PasswordPatternVerifier()
 
     override fun create(filial: Filial): Int {
         var res: Int = 0
@@ -31,7 +33,7 @@ class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowire
             }
 
             val res2: Deferred<Boolean> = async {
-                checker.verifyPass(filial.pass)
+                pswdVerifier.verify(filial.pass)
             }
 
             val res3: Deferred<Boolean> = async {

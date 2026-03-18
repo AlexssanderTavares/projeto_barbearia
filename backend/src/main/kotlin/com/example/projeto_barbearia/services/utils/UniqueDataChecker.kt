@@ -24,24 +24,6 @@ class UniqueDataChecker() {
         }
     }
 
-    fun verifyPass(pass: String): Boolean {
-        var res: Boolean =  false
-        val scope: Job = CoroutineScope(Dispatchers.Unconfined).launch {
-            if(pass.length >= 8 && pass.contains(Regex("[^a-zA-Z0-9\\s]")) && pass.contains(Regex("[a-zA-Z0-9]"))){
-                res = true
-            }
-        }
-
-        scope.start()
-
-        return if(scope.isCompleted){
-            res
-        } else {
-            res
-        }
-
-    }
-
     fun verifyPostalCode(code: String): Boolean{
         var res: Boolean = false
         val scope: Job = CoroutineScope(Dispatchers.Unconfined).launch {

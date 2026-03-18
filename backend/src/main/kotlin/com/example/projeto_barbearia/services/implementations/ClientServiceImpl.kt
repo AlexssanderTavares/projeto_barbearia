@@ -1,5 +1,6 @@
 package com.project.barbearia.services.implementations
 
+import com.example.projeto_barbearia.services.utils.PasswordPatternVerifier
 import com.project.barbearia.data.models.Cliente
 import com.project.barbearia.data.models.views.ClientView
 import com.project.barbearia.data.repositories.ClienteRepository
@@ -23,6 +24,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository): ClientService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
+    private val pswdVerifier: PasswordPatternVerifier = PasswordPatternVerifier()
 
     override fun create(cliente: Cliente): Int {
         var res: Int = 0
@@ -33,7 +35,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
             }
 
             val res2: Deferred<Boolean> = async {
-                checker.verifyPass(cliente.pass)
+                pswdVerifier.verify(cliente.pass)
             }
 
             val res3: Deferred<Boolean> = async {
