@@ -1,6 +1,9 @@
 package com.project.barbearia.services.implementations
 
-import com.example.projeto_barbearia.services.utils.PasswordPatternVerifier
+import com.example.projeto_barbearia.data.DTOs.Cliente.ClienteCreationDTO
+import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
 import com.project.barbearia.data.models.Cliente
 import com.project.barbearia.data.models.views.ClientView
 import com.project.barbearia.data.repositories.ClienteRepository
@@ -13,96 +16,90 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.Optional
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration
 
 @Service
-class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository): ClientService {
+class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository) : ClientService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
-    private val pswdVerifier: PasswordPatternVerifier = PasswordPatternVerifier()
+    private lateinit var verifier: PatternVerifier
 
-    override fun create(cliente: Cliente): Int {
+    override suspend fun create(cliente: ClienteCreationDTO): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
 
             val res1: Deferred<Boolean> = async {
-                checker.verifyEmail(cliente.email) && getByEmail(cliente.email).isEmpty
+                println("Verifying email...")
+                verifier = EmailPatternVerifier()
+                val r1: Boolean = verifier.verify(cliente.email) && getByEmail(cliente.email).isEmpty
+                println("Email verification completion result: $r1")
+                r1
             }
 
             val res2: Deferred<Boolean> = async {
-                pswdVerifier.verify(cliente.pass)
+                println("Verifying password...")
+                verifier = PasswordPatternVerifier()
+                val r2: Boolean = verifier.verify(cliente.pass)
+                println("Password verification completion result: $r2")
+                r2
             }
 
-            val res3: Deferred<Boolean> = async {
-                checker.verifyPostalCode(cliente.cep!!)
-            }
+            /*val res3: Deferred<Boolean?> = async {
+                var r3: Boolean? = null
+                println("Verifying postal code...")
+                if(cliente.cep != null) {
+                 r3 = verifier.verify(cliente.cep!!)
+                }
+                println("Postal code verification completion result: $r3")
+                r3
+            }*/
 
-            if (res1.await() && res2.await() && res3.await()) {
-                repo.save(cliente)
+            val answer: Boolean = res1.await() && res2.await()
+
+            println("Answer: ${answer}")
+
+            if (answer) {
+                repo.save(Cliente(null, cliente.name, cliente.email, cliente.pass, null))
                 repo.flush()
                 res = 1
             } else {
-                when {
-                    !res1.await() -> {
-                        coroutineContext.cancel(
-                            CancellationException(
-                                "Entrada de texto inválida como endereço de E-Mail",
-                                IllegalArgumentException()
-                            )
-                        )
-                        res = -1
-                    }
-
-                    !res2.await() -> {
-                        coroutineContext.cancel(
-                            CancellationException(
-                                "Senha precisa conter números, ao menos uma letra maiúscula e ao menos um símbolo não alfabético",
-                                IllegalArgumentException()
-                            )
-                        )
-                        res = -1
-                    }
-
-                    !res3.await() -> {
-                        coroutineContext.cancel(
-                            CancellationException(
-                                "Entrada de cep inválida",
-                                IllegalArgumentException()
-                            )
-                        )
-                        res = -1
-                    }
-                }
+                res = -1
             }
         }
 
         scope.start()
 
-        return when{
-            scope.isCompleted -> res
-            scope.isCancelled -> res
-            else -> 0
+        println("Coroutine started? ${scope.isActive}")
+
+        delay(2000)
+
+        return if(scope.isCompleted){
+            res
+        } else {
+            res
         }
     }
 
-    override fun getById(id: UUID): Optional<ClientView> {
+    override suspend fun getById(id: UUID): Optional<ClientView> {
         return viewRepo.findById(id)
     }
 
-    override fun getByEmail(email: String): Optional<ClientView> {
+    override suspend fun getByEmail(email: String): Optional<ClientView> {
         return viewRepo.findByEmail(email)
     }
 
-    override fun getAll(): List<ClientView> {
+    override suspend fun getAll(): List<ClientView> {
         return viewRepo.findAll()
     }
 
-    override fun delete(cliente: Cliente): Int {
+    override suspend fun delete(cliente: Cliente): Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
@@ -122,14 +119,14 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         }
 
         scope.start()
-        return when{
+        return when {
             scope.isCompleted -> res
             scope.isCancelled -> res
             else -> 0
         }
     }
 
-    override fun updatePass(cliente: Cliente): Int {
+    override suspend fun updatePass(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -152,14 +149,14 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
         scope.start()
 
-        return when{
+        return when {
             scope.isCompleted -> res
             scope.isCancelled -> res
             else -> 0
         }
     }
 
-    override fun updateEmail(cliente: Cliente): Int {
+    override suspend fun updateEmail(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -182,14 +179,14 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
         scope.start()
 
-        return when{
+        return when {
             scope.isCompleted -> res
             scope.isCancelled -> res
             else -> 0
         }
     }
 
-    override fun updateCep(cliente: Cliente): Int {
+    override suspend fun updateCep(cliente: Cliente): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -212,7 +209,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
         scope.start()
 
-        return when{
+        return when {
             scope.isCompleted -> res
             scope.isCancelled -> res
             else -> 0

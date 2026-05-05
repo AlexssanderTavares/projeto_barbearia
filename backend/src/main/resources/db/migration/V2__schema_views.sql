@@ -19,7 +19,7 @@ CREATE OR REPLACE VIEW profissional_por_filial AS
     INNER JOIN filial FL
         ON pro.id_filial = fl.id_filial;
 
-CREATE OR REPLACE VIEW serivco_por_cliente AS
+CREATE OR REPLACE VIEW servico_por_cliente AS
     SELECT cl.nome AS nomecliente, cl.telefone AS contatocliente, cl.email AS emailcliente, svc.id_servico AS codigoservico,
     svc.nome AS nomeservico, duracao, preco, qt_servico AS quantidadesolicitada
     FROM cliente CL

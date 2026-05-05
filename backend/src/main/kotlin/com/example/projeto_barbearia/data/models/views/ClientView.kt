@@ -9,7 +9,7 @@ import java.util.UUID
 
 @Immutable
 @Entity
-@Table(name = "Cliente_View")
+@Table(name = "cliente_view")
 data class ClientView(
 
     @Id

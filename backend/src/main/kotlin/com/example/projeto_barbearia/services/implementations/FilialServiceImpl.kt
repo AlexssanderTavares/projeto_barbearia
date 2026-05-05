@@ -1,6 +1,8 @@
 package com.project.barbearia.services.implementations
 
-import com.example.projeto_barbearia.services.utils.PasswordPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
 import com.project.barbearia.data.models.Filial
 import com.project.barbearia.data.models.views.FilialView
 import com.project.barbearia.data.repositories.FilialRepository
@@ -22,18 +24,20 @@ import java.util.UUID
 class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowired private val viewRepo: FilialViewRepository): FilialService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
-    private val pswdVerifier: PasswordPatternVerifier = PasswordPatternVerifier()
+    private lateinit var verifier: PatternVerifier
 
-    override fun create(filial: Filial): Int {
+    override suspend fun create(filial: Filial): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
 
             val res1: Deferred<Boolean> = async{
-                checker.verifyEmail(filial.email) && viewRepo.findByEmail(filial.email).isEmpty
+                verifier = EmailPatternVerifier()
+                verifier.verify(filial.email) && viewRepo.findByEmail(filial.email).isEmpty
             }
 
             val res2: Deferred<Boolean> = async {
-                pswdVerifier.verify(filial.pass)
+                verifier = PasswordPatternVerifier()
+                verifier.verify(filial.pass)
             }
 
             val res3: Deferred<Boolean> = async {
@@ -41,7 +45,7 @@ class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowire
             }
 
             val res4: Deferred<Boolean> = async {
-                checker.verifyPostalCode(filial.cep)
+                verifier.verify(filial.cep)
             }
 
             if(res1.await() && res2.await() && res3.await() && res4.await()) {
@@ -95,23 +99,23 @@ class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowire
         }
     }
 
-    override fun getById(id: UUID): Optional<FilialView> {
+    override suspend fun getById(id: UUID): Optional<FilialView> {
         return viewRepo.findById(id)
     }
 
-    override fun getByCnpj(cnpj: String): Optional<FilialView> {
+    override suspend fun getByCnpj(cnpj: String): Optional<FilialView> {
         return viewRepo.findByCnpj(cnpj)
     }
 
-    override fun getByEmail(email: String): Optional<FilialView> {
+    override suspend fun getByEmail(email: String): Optional<FilialView> {
         return viewRepo.findByEmail(email)
     }
 
-    override fun getAll(): List<FilialView> {
+    override suspend fun getAll(): List<FilialView> {
         return viewRepo.findAll()
     }
 
-    override fun delete(filial: Filial): Int {
+    override suspend fun delete(filial: Filial): Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
@@ -137,7 +141,7 @@ class FilialServiceImpl(@Autowired private val repo: FilialRepository, @Autowire
         }
     }
 
-    override fun updateQuantity(filial: Filial, quantity: Int): Int {
+    override suspend fun updateQuantity(filial: Filial, quantity: Int): Int {
         var res: Int = 0
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
             try {

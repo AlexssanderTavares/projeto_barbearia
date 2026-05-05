@@ -1,6 +1,6 @@
 package com.example.projeto_barbearia.unit
 
-import com.example.projeto_barbearia.services.utils.PasswordPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import kotlin.test.Test
 import kotlin.test.assertEquals

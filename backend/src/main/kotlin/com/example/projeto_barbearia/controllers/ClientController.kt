@@ -22,14 +22,14 @@ class ClientController(
      * front-end, ao finalizar o preenchimento, um objeto JSON deve ser enviado via comunicação HTTP
      * (POST) no endereço abaixo
      * */
-    @PostMapping("/new")
+    /*@PostMapping("/new")
     fun create(@RequestBody cli: Cliente): ResponseEntity<Int> {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(service.create(cli))
         } catch (e: IllegalArgumentException){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null)
         }
-    }
+    }*/
 
     /*** Função que lista todos os clientes registrados no banco de dados, a lista é retornada como um Array de
      * objetos JSON

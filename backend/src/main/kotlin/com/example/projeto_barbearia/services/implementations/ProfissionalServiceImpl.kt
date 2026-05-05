@@ -1,5 +1,7 @@
 package com.project.barbearia.services.implementations
 
+import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
+import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
 import com.project.barbearia.data.models.Profissional
 import com.project.barbearia.data.models.views.ProfissionalView
 import com.project.barbearia.data.repositories.ProfissionalRepository
@@ -21,13 +23,14 @@ import kotlin.coroutines.cancellation.CancellationException
 class ProfissionalServiceImpl(@Autowired private val repo: ProfissionalRepository, @Autowired private val viewRepo: ProfissionalViewRepository): ProfissionalService {
 
     private val checker: UniqueDataChecker = UniqueDataChecker()
+    private lateinit var verifier: PatternVerifier
 
-    override fun create(profissional: Profissional) : Int{
+    override suspend fun create(profissional: Profissional) : Int{
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
 
-            if(checker.verifyEmail(profissional.email) && getByEmail(profissional.email).isEmpty()){
+            if(verifier.verify(profissional.email) && getByEmail(profissional.email).isEmpty()){
                 repo.save(profissional)
                 repo.flush()
                 res = 1
@@ -47,19 +50,19 @@ class ProfissionalServiceImpl(@Autowired private val repo: ProfissionalRepositor
         }
     }
 
-    override fun getByEmail(email: String) : Optional<ProfissionalView> {
+    override suspend fun getByEmail(email: String) : Optional<ProfissionalView> {
         return viewRepo.findByEmail(email)
     }
 
-    override fun getById(id: UUID): Optional<ProfissionalView> {
+    override suspend fun getById(id: UUID): Optional<ProfissionalView> {
         return viewRepo.findById(id)
     }
 
-    override fun getAll() : List<ProfissionalView>{
+    override suspend fun getAll() : List<ProfissionalView>{
         return viewRepo.findAll()
     }
 
-    override fun delete(profissional: Profissional): Int {
+    override suspend fun delete(profissional: Profissional): Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {
@@ -84,7 +87,7 @@ class ProfissionalServiceImpl(@Autowired private val repo: ProfissionalRepositor
         }
     }
 
-    override fun updateEmail(profissional: Profissional) : Int {
+    override suspend fun updateEmail(profissional: Profissional) : Int {
         var res: Int = 0
 
         val scope: Job = CoroutineScope(Dispatchers.IO).launch {

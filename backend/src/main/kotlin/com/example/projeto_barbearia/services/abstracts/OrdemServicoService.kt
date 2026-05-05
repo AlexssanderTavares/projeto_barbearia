@@ -15,13 +15,13 @@ import java.util.Optional
 
 interface OrdemServicoService {
 
-    fun create(os: OrdemServico): Int
+    suspend fun create(os: OrdemServico): Int
 
-    fun getById(id: Long): Optional<OSView>
+    suspend fun getById(id: Long): Optional<OSView>
 
-    fun getAll(): List<OSView>
+    suspend fun getAll(): List<OSView>
 
-    fun delete(os: OrdemServico): Int
+    suspend fun delete(os: OrdemServico): Int
 
-    fun update(os: OrdemServico, newDate: LocalDateTime): Int
+    suspend fun update(os: OrdemServico, newDate: LocalDateTime): Int
 }
