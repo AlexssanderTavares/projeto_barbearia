@@ -1,1 +1,0 @@
-ALTER TABLE ordemservico ADD CONSTRAINT fk_tiposervico FOREIGN KEY(id_servico) REFERENCES tiposervico(id_servico);

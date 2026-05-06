@@ -1,6 +1,6 @@
-package com.project.barbearia.data.repositories
+package com.example.projeto_barbearia.data.repositories.cliente_case
 
-import com.project.barbearia.data.models.Cliente
+import com.example.projeto_barbearia.data.models.Cliente
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 

@@ -7,7 +7,7 @@ ALTER TABLE associacao_os_servico ADD COLUMN vlr_unit NUMERIC(38,2) NOT NULL;
 ALTER TABLE associacao_os_servico ADD COLUMN total_solicitado NUMERIC(38,2) NOT NULL;
 
 CREATE OR REPLACE VIEW Cliente_View AS
-    SELECT id_cliente, nome, email, endereco, cliente.telefone FROM cliente
+    SELECT id_cliente, nome, email, endereco, telefone FROM cliente
         INNER JOIN contato_cliente AS contato
             ON Cliente.id_cliente = contato.client;
 
@@ -17,7 +17,7 @@ CREATE OR REPLACE VIEW Filial_View AS
             ON filial.id_filial = contato.filial;
 
 CREATE OR REPLACE VIEW Profissional_View AS
-    SELECT id_prof, id_filial, nome, email, profissional.telefone FROM profissional
+    SELECT id_prof, id_filial, nome, email, telefone FROM profissional
         INNER JOIN contato_profissional AS contato
             ON profissional.id_prof = contato.profissional;
 
