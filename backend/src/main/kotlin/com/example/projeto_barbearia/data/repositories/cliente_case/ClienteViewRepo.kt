@@ -1,15 +1,14 @@
 package com.example.projeto_barbearia.data.repositories.cliente_case
 
-import com.project.barbearia.data.models.views.ClientView
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.NoRepositoryBean
+import com.example.projeto_barbearia.data.models.views.Cliente_View
+import com.example.projeto_barbearia.data.repositories.ReadOnlyRepository
+import org.springframework.stereotype.Repository
 import java.util.Optional
 import java.util.UUID
 
-@NoRepositoryBean
-interface ClienteViewRepo: CrudRepository<ClientView, UUID> {
+interface ClienteViewRepo: ReadOnlyRepository<Cliente_View, UUID> {
 
-    override fun findById(id: UUID) : Optional<ClientView>
+    override fun findById(id: UUID) : Optional<Cliente_View>
 
-    override fun findAll(): List<ClientView>
+    override fun findAll(): List<Cliente_View>
 }
