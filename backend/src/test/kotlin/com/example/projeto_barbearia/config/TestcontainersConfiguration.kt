@@ -15,9 +15,8 @@ class TestcontainersConfiguration {
 	@ServiceConnection
 	fun postgresContainer(): PostgreSQLContainer {
 		val container: PostgreSQLContainer? = PostgreSQLContainer(DockerImageName.parse("postgres:latest")).let {
-			it.withDatabaseName("projeto-barbearia")
-			it.withUsername("projeto-barbearia")
-			it.withPassword("12345")
+			it.withDatabaseName("projeto_barbearia")
+			it.withUsername("projeto_barbearia")
 			it.withExposedPorts(5432)
 		}
 

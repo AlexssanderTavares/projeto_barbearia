@@ -1,4 +1,4 @@
-package com.project.barbearia.data.models.views
+package com.example.projeto_barbearia.data.models.views
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -11,12 +11,11 @@ import java.util.UUID
 
 @Immutable
 @Entity
-@Table(name = "agendamento")
 data class Agendamento(
 
     @Id
     @Column(name = "id_os")
-    val id: Int,
+    val id: Long,
 
     @Column(name = "data")
     val data: LocalDateTime,

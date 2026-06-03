@@ -1,4 +1,4 @@
-package com.project.barbearia.data.models
+package com.example.projeto_barbearia.data.models
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -32,7 +32,4 @@ data class Filial(
 
     @Column(name = "qtd_profissionais")
     var qt_prof: Int = 0,
-
-    @Column(name = "endereco")
-    val cep: String
     )

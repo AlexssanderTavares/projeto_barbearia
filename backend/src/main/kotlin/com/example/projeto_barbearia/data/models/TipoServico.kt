@@ -1,4 +1,4 @@
-package com.project.barbearia.data.models
+package com.example.projeto_barbearia.data.models
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.math.BigDecimal
-import java.util.UUID
 
 
 @Entity(name = "tiposervico")
@@ -17,7 +16,7 @@ data class TipoServico(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_servico")
-    val id: Int,
+    val id: Long,
 
     @Column(name = "nome")
     val name: String,
@@ -27,9 +26,6 @@ data class TipoServico(
 
     @Column(name = "preco")
     var price: BigDecimal = BigDecimal.ZERO,
-
-    @Column(name = "qt_servico")
-    val quantity: Int,
 
     @Column(name = "descricao")
     val description: String

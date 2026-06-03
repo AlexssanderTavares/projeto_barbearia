@@ -1,7 +1,7 @@
-package com.project.barbearia.services.abstracts
+package com.example.projeto_barbearia.services.abstracts
 
-import com.project.barbearia.data.models.Filial
-import com.project.barbearia.data.models.views.FilialView
+import com.example.projeto_barbearia.data.models.Filial
+import com.example.projeto_barbearia.data.models.views.FilialView
 import java.util.Optional
 import java.util.UUID
 

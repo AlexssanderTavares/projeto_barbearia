@@ -1,4 +1,4 @@
-package com.project.barbearia.data.models
+package com.example.projeto_barbearia.data.models
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

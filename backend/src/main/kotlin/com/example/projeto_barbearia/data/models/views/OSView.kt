@@ -1,4 +1,4 @@
-package com.project.barbearia.data.models.views
+package com.example.projeto_barbearia.data.models.views
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -9,9 +9,10 @@ import org.hibernate.annotations.Immutable
 import java.math.BigDecimal
 import java.util.UUID
 
-@Immutable
+
 @Entity
 @Table(name = "os_view")
+@Immutable
 data class OSView(
 
     @Id

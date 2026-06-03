@@ -1,4 +1,4 @@
-package com.project.barbearia.services.utils
+package com.example.projeto_barbearia.services.utils
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

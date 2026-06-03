@@ -1,13 +1,5 @@
-package com.project.barbearia.controllers
+package com.example.projeto_barbearia.controllers
 
-import com.project.barbearia.data.models.Filial
-import com.project.barbearia.data.repositories.FilialRepository
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -15,10 +7,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/cpny")
 class FilialController(
-    @Autowired
-    val repository: FilialRepository
+
 ) {
-    private val list: MutableList<Filial> = repository.findAll()
+    /*private val list: MutableList<Filial> = repository.findAll()
     @PostMapping("/new")
     fun create(@RequestBody filial: Filial) : ResponseEntity<Filial>{
         try{
@@ -47,5 +38,5 @@ class FilialController(
         } catch (e: Exception){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
         }
-    }
+    }*/
 }

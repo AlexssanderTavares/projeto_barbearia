@@ -8,17 +8,14 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.util.UUID
 
-@Entity(name = "profissional")
-@Table(name = "profissional")
-data class Profissional(
+@Entity
+@Table(name = "cliente")
+data class Cliente(
 
     @Id
-    @Column(name = "id_prof")
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID,
-
-    @Column(name = "id_filial")
-    val idFilial: UUID,
+    @Column(name = "id_cliente")
+    var id: UUID? = null,
 
     @Column(name = "nome")
     val name: String,
@@ -26,4 +23,6 @@ data class Profissional(
     @Column(name = "email")
     val email: String,
 
-)
+    @Column(name = "pass")
+    val pass: String,
+    )

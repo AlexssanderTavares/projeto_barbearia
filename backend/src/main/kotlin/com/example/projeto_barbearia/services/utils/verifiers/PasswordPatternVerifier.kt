@@ -10,8 +10,9 @@ class PasswordPatternVerifier: PatternVerifier {
             var itContainsSymbols: Boolean = patterns.elementAt(0).containsMatchIn(code)
             var itIsAString: Boolean = patterns.elementAt(1).containsMatchIn(code)
             var itContainsADigitSequence: Boolean = patterns.elementAt(2).containsMatchIn(code)
+            var isLengthInRange: Boolean = code!!.length <= 8
 
-            if (itContainsSymbols && itIsAString && itContainsADigitSequence) {
+            if (itContainsSymbols && itIsAString && itContainsADigitSequence && isLengthInRange) {
                 isValid = true
             }
 

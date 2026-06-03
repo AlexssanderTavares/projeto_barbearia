@@ -1,7 +1,7 @@
-package com.project.barbearia.services.abstracts
+package com.example.projeto_barbearia.services.abstracts
 
-import com.project.barbearia.data.models.TipoServico
-import com.project.barbearia.data.models.views.ServicoView
+import com.example.projeto_barbearia.data.models.TipoServico
+import com.example.projeto_barbearia.data.models.views.ServicoView
 import java.util.Optional
 
 interface TipoServicoService {

@@ -1,4 +1,4 @@
-package com.project.barbearia.data.models.views
+package com.example.projeto_barbearia.data.models.views
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -7,13 +7,13 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.Immutable
 import java.math.BigDecimal
 
-@Immutable
 @Entity
-@Table(name = "servico_View")
+@Table(name = "servico_view")
+@Immutable
 data class ServicoView(
     @Id
     @Column(name = "id_servico")
-    val id: Int,
+    val id: Long,
 
     @Column(name = "nome")
     val name: String,

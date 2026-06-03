@@ -1,15 +1,7 @@
-package com.project.barbearia.services.abstracts
+package com.example.projeto_barbearia.services.abstracts
 
-import com.project.barbearia.data.models.OrdemServico
-import com.project.barbearia.data.models.views.OSView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import java.time.DateTimeException
+import com.example.projeto_barbearia.data.models.OrdemServico
+import com.example.projeto_barbearia.data.models.views.OSView
 import java.time.LocalDateTime
 import java.util.Optional
 

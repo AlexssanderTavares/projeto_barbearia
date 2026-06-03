@@ -1,15 +1,17 @@
-package com.project.barbearia.services.implementations
+package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.data.DTOs.Cliente.ClienteCreationDTO
+import com.example.projeto_barbearia.data.dtos.cliente.ClienteCreationDTO
+import com.example.projeto_barbearia.data.dtos.cliente.ClienteView
 import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
-import com.project.barbearia.data.models.Cliente
-import com.project.barbearia.data.models.views.ClientView
-import com.project.barbearia.data.repositories.ClienteRepository
-import com.project.barbearia.data.repositories.ClienteViewRepository
-import com.project.barbearia.services.abstracts.ClientService
-import com.project.barbearia.services.utils.UniqueDataChecker
+import com.example.projeto_barbearia.data.models.Cliente
+import com.example.projeto_barbearia.data.models.views.Cliente_View
+import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
+import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo
+import com.example.projeto_barbearia.services.abstracts.ClientService
+import jakarta.persistence.Entity
+import jakarta.transaction.Transactional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -20,25 +22,24 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.servlet.function.ServerResponse.async
 import java.util.Optional
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration
 
 @Service
-class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepository) : ClientService {
+class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepo) : ClientService {
 
-    private val checker: UniqueDataChecker = UniqueDataChecker()
     private lateinit var verifier: PatternVerifier
 
     override suspend fun create(cliente: ClienteCreationDTO): Int {
         var res: Int = 0
-        val scope: Job = CoroutineScope(Dispatchers.IO).launch {
+        val createClientTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
 
             val res1: Deferred<Boolean> = async {
                 println("Verifying email...")
                 verifier = EmailPatternVerifier()
-                val r1: Boolean = verifier.verify(cliente.email) && getByEmail(cliente.email).isEmpty
+                val r1: Boolean = verifier.verify(cliente.email)
                 println("Email verification completion result: $r1")
                 r1
             }
@@ -51,53 +52,75 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
                 r2
             }
 
-            /*val res3: Deferred<Boolean?> = async {
-                var r3: Boolean? = null
-                println("Verifying postal code...")
-                if(cliente.cep != null) {
-                 r3 = verifier.verify(cliente.cep!!)
-                }
-                println("Postal code verification completion result: $r3")
-                r3
-            }*/
-
             val answer: Boolean = res1.await() && res2.await()
 
             println("Answer: ${answer}")
-
+            delay(2000)
             if (answer) {
-                repo.save(Cliente(null, cliente.name, cliente.email, cliente.pass, null))
-                repo.flush()
+                repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
                 res = 1
+                res
             } else {
                 res = -1
+                res
             }
         }
 
-        scope.start()
-
-        println("Coroutine started? ${scope.isActive}")
-
-        delay(2000)
-
-        return if(scope.isCompleted){
+        return if(createClientTask.await() > 0){
             res
         } else {
             res
         }
     }
 
-    override suspend fun getById(id: UUID): Optional<ClientView> {
-        return viewRepo.findById(id)
+    override suspend fun getById(id: UUID): ClienteView? {
+        val client: Optional<Cliente> = repo.findById(id)
+        val res: ClienteView = ClienteView(client.get().id!!, client.get().name, client.get().email)
+        return res ?: throw ClassNotFoundException("Cliente not found")
     }
 
-    override suspend fun getByEmail(email: String): Optional<ClientView> {
-        return viewRepo.findByEmail(email)
+    override suspend fun getAll(): ArrayList<Cliente_View> {
+        //using Client Repository
+        val retriveEveryClientsTask: Deferred<ArrayList<Cliente_View>> = CoroutineScope(Dispatchers.IO).async{
+            println("Getting: ${viewRepo.findAll()} | with size of: ${viewRepo.findAll().size}")
+            val clients = viewRepo.findAll()
+            val resList: ArrayList<Cliente_View> = arrayListOf()
+            clients.forEach {
+                var clientView: Cliente_View = it
+                resList.add(clientView)
+            }
+            resList
+        }
+
+        return retriveEveryClientsTask.await()
+
+        //Using View Repository
+        //return viewRepo.findAll()
     }
 
-    override suspend fun getAll(): List<ClientView> {
-        return viewRepo.findAll()
+    override suspend fun getByEmail(email: String): Cliente_View? {
+        println("Trying to find a register with such data...")
+
+        val searchForClientByEmailTask: Deferred<Cliente_View?> = CoroutineScope(Dispatchers.IO).async {
+            var cv: Cliente_View? = null
+            getAll().forEach {
+                println(it.toString())
+                if (it.email == email) {
+                    println(it.toString())
+                    cv = it
+                }
+            }
+            cv
+        }
+
+            val res: Cliente_View = searchForClientByEmailTask.await()!!
+
+            return if (searchForClientByEmailTask.isCompleted) {
+                println("Answer: $res")
+                res
+            }else null
     }
+
 
     override suspend fun delete(cliente: Cliente): Int {
         var res: Int = 0
