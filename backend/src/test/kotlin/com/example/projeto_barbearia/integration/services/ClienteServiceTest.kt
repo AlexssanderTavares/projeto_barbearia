@@ -1,20 +1,16 @@
 package com.example.projeto_barbearia.integration.services
 
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteCreationDTO
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteView
+import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
 import com.example.projeto_barbearia.data.models.Cliente
 import com.example.projeto_barbearia.data.models.views.Cliente_View
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo
-import com.example.projeto_barbearia.services.abstracts.ClientService
 import com.example.projeto_barbearia.services.implementations.ClientServiceImpl
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.fail
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -23,6 +19,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 @Import(TestcontainersConfiguration::class)
 @Testcontainers
@@ -40,9 +37,12 @@ class ClienteServiceTest {
     @Autowired
     lateinit var clienteViews: ClienteViewRepo
 
+    private lateinit var dummy: ClienteRequestDTO
+
     @BeforeTest
     suspend fun setup() {
         runBlocking {
+            dummy = ClienteRequestDTO("Dummy", "dummy@test.com", "#dummy12")
             container.start()
             clientService = ClientServiceImpl(clienteRepository, clienteViews)
         }
@@ -63,7 +63,7 @@ class ClienteServiceTest {
     suspend fun tryCreateClientUsingFakeClientInstanceAndReturnSuccess() {
             val cliente: Cliente = Cliente(id = null, name = "TesteDummy", email = "dummy@test.com", pass ="@pass123")
             try {
-                assertEquals(1, clientService.create(ClienteCreationDTO(cliente.name, cliente.email, cliente.pass)))
+                assertEquals(1, clientService.create(ClienteRequestDTO(cliente.name, cliente.email, cliente.pass)))
             } catch (e: Exception) {
                 e.printStackTrace()
                 fail(e.message)
@@ -73,9 +73,8 @@ class ClienteServiceTest {
 
     @Test
     suspend fun tryCreateClientUsingCreationDTOAndReturnSuccess() {
-            val dto: ClienteCreationDTO = ClienteCreationDTO("Dummy", "dummy@test.com", "#12dummy")
             try {
-                assertEquals(1, clientService.create(dto))
+                assertEquals(1, clientService.create(dummy))
             } catch (e: Exception) {
                 e.printStackTrace()
                 fail(e.message)
@@ -84,9 +83,9 @@ class ClienteServiceTest {
 
     @Test
     suspend fun tryCreateClientUsingFakeClientInstanceAndReturnFailure() {
-        val dto1: ClienteCreationDTO = ClienteCreationDTO("Dummy1", "dummy1@teste.com", "12dummy")
-        val dto2: ClienteCreationDTO = ClienteCreationDTO( "Dummy2", "dummy2teste.com", "@12dummy")
-        val dto3: ClienteCreationDTO = ClienteCreationDTO( "Dummy3", "dummy3teste.com", "12dummy")
+        val dto1: ClienteRequestDTO = ClienteRequestDTO("Dummy1", "dummy1@teste.com", "12dummy")
+        val dto2: ClienteRequestDTO = ClienteRequestDTO( "Dummy2", "dummy2teste.com", "@12dummy")
+        val dto3: ClienteRequestDTO = ClienteRequestDTO( "Dummy3", "dummy3teste.com", "12dummy")
 
         try {
             assertEquals(-1, clientService.create(dto1))
@@ -101,9 +100,9 @@ class ClienteServiceTest {
     @Test
     suspend fun tryGetAllRegistersAsAListOfViews(){
         println("Creating subjects...")
-        val dto1: ClienteCreationDTO = ClienteCreationDTO("Dummy1", "dummy1@teste.com", "#13dummy")
-        val dto2: ClienteCreationDTO = ClienteCreationDTO("Dummy2", "dummy2@teste.com", "@12dummy")
-        val dto3: ClienteCreationDTO = ClienteCreationDTO("Dummy3", "dummy3@teste.com", "$12dummy")
+        val dto1: ClienteRequestDTO = ClienteRequestDTO("Dummy1", "dummy1@teste.com", "#13dummy")
+        val dto2: ClienteRequestDTO = ClienteRequestDTO("Dummy2", "dummy2@teste.com", "@12dummy")
+        val dto3: ClienteRequestDTO = ClienteRequestDTO("Dummy3", "dummy3@teste.com", "$12dummy")
 
         clientService.create(dto1)
         clientService.create(dto2)
@@ -128,8 +127,8 @@ class ClienteServiceTest {
     @Test
     suspend fun tryGetClienteUsingDTOandReturnAnExistingClientInDatabase() {
         var target: Cliente_View? = null
-        var created: Int = clientService.create(ClienteCreationDTO("Dummy", "dummy@test.com", "#dummy12"))
-        println("Dummy registered in database with result code: $created")
+        var res: Int = clientService.create(dummy)
+        println("Dummy registered in database with result code: $res")
 
             try {
                 target = clientService.getByEmail("dummy@test.com")!!
@@ -141,6 +140,70 @@ class ClienteServiceTest {
                 println(target)
             }
         assertNotNull(target)
+    }
+
+    @Test
+    suspend fun tryDeleteClienteUsingRequestDTOAndReturnSuccess() {
+        try{
+            println("Creating dummy... Result code: ${clientService.create(dummy)}")
+            println("Now trying to delete it...")
+            assertEquals(1, clientService.delete(dummy))
+            assertEquals(null, clientService.getByEmail(dummy.email))
+        }catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        }
+    }
+
+    @Test
+    suspend fun tryUpdateClienteEmailByUsingRequestDTOAndReturnSuccess() {
+        try{
+            println("Creating dummy... result code: ${clientService.create(dummy)}")
+            var res: Int = clientService.update(clientService.getByEmail(dummy.email)!!.id_cliente, ClienteRequestDTO(dummy.name, "dummy_updated@test.com", dummy.pass))
+
+            println("Trying to update email...Result: ${res}")
+            assertEquals(1, res , message = "Email updated..." )
+
+            val target: Cliente_View? = clientService.getByEmail("dummy_updated@test.com")
+            assertNotEquals(null, target, "Updated data: ${target}" )
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        }
+    }
+
+    @Test
+    suspend fun tryUpdateClienteNameByUsingRequestDTOAndReturnSuccess() {
+        try{
+            println("Creating dummy... result code: ${clientService.create(dummy)}")
+            val res: Int = clientService.update(clientService.getByEmail(dummy.email)!!.id_cliente, ClienteRequestDTO("Updated_Dummy", dummy.email, dummy.pass))
+
+            println("Trying to update name...Result: ${res}")
+            assertEquals(1, res, message = "Name updated..." )
+
+            val target: Cliente_View? = clientService.getByEmail(dummy.email)
+            assertNotEquals(dummy.name, target!!.nome, "Updated data: ${target}")
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        }
+    }
+
+    @Test
+    suspend fun tryUpdateClientePasswordByUsingRequestDTOAndReturnSuccess() {
+        try{
+            println("Creating dummy... result code: ${clientService.create(dummy)}")
+            val res: Int = clientService.update(clientService.getByEmail(dummy.email)!!.id_cliente, ClienteRequestDTO(dummy.name, dummy.email, "#Pass456"))
+
+            println("Trying to update name...Result: ${res}")
+            assertEquals(1, res, message = "Password updated..." )
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        }
     }
 
 }

@@ -1,7 +1,6 @@
 package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteCreationDTO
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteView
+import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
 import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
@@ -10,19 +9,14 @@ import com.example.projeto_barbearia.data.models.views.Cliente_View
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo
 import com.example.projeto_barbearia.services.abstracts.ClientService
-import jakarta.persistence.Entity
-import jakarta.transaction.Transactional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.web.servlet.function.ServerResponse.async
 import java.util.Optional
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
@@ -32,7 +26,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
     private lateinit var verifier: PatternVerifier
 
-    override suspend fun create(cliente: ClienteCreationDTO): Int {
+    override suspend fun create(cliente: ClienteRequestDTO): Int {
         var res: Int = 0
         val createClientTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
 
@@ -66,21 +60,15 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
             }
         }
 
-        return if(createClientTask.await() > 0){
-            res
-        } else {
-            res
-        }
+        return createClientTask.await()
     }
 
-    override suspend fun getById(id: UUID): ClienteView? {
+    override suspend fun getById(id: UUID): Cliente {
         val client: Optional<Cliente> = repo.findById(id)
-        val res: ClienteView = ClienteView(client.get().id!!, client.get().name, client.get().email)
-        return res ?: throw ClassNotFoundException("Cliente not found")
+        return if (client.isPresent) client.get() else throw ClassNotFoundException("Cliente not found or doesn't exist")
     }
 
     override suspend fun getAll(): ArrayList<Cliente_View> {
-        //using Client Repository
         val retriveEveryClientsTask: Deferred<ArrayList<Cliente_View>> = CoroutineScope(Dispatchers.IO).async{
             println("Getting: ${viewRepo.findAll()} | with size of: ${viewRepo.findAll().size}")
             val clients = viewRepo.findAll()
@@ -93,9 +81,6 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         }
 
         return retriveEveryClientsTask.await()
-
-        //Using View Repository
-        //return viewRepo.findAll()
     }
 
     override suspend fun getByEmail(email: String): Cliente_View? {
@@ -113,25 +98,23 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
             cv
         }
 
-            val res: Cliente_View = searchForClientByEmailTask.await()!!
-
-            return if (searchForClientByEmailTask.isCompleted) {
-                println("Answer: $res")
-                res
-            }else null
+        return searchForClientByEmailTask.await()
     }
 
-
-    override suspend fun delete(cliente: Cliente): Int {
+    override suspend fun delete(cliente: ClienteRequestDTO): Int {
         var res: Int = 0
 
-        val scope: Job = CoroutineScope(Dispatchers.IO).launch {
+        val scope: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+
             try {
-                if (cliente == getByEmail(cliente.email) || cliente.id == getById(cliente.id!!)) {
-                    repo.delete(cliente)
-                    repo.flush()
-                    res += 1
+                val cliente: Cliente = getByEmail(cliente.email).let {it: Cliente_View? ->
+                    getById(it!!.id_cliente)
                 }
+
+                repo.delete(cliente)
+                repo.flush()
+                res += 1
+
             } catch (e: IllegalArgumentException) {
                 res = -1
                 coroutineContext.cancel(CancellationException("Argumento inválido na chamada do método delete"))
@@ -139,104 +122,47 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
                 res = -1
                 coroutineContext.cancel(CancellationException("Registro não existe"))
             }
+
+            res
         }
 
-        scope.start()
-        return when {
-            scope.isCompleted -> res
-            scope.isCancelled -> res
-            else -> 0
-        }
+        return scope.await()
     }
 
-    override suspend fun updatePass(cliente: Cliente): Int {
-        var res: Int = 0
-        val scope: Job = CoroutineScope(Dispatchers.IO).launch {
-            try {
-                if ((cliente == getByEmail(cliente.email) || cliente == getById(cliente.id!!)) && cliente.pass != repo.findById(
-                        cliente.id!!
-                    ).get().pass
-                ) {
-                    repo.save(cliente)
-                    repo.flush()
-                    res += 1
+    override suspend fun update(id: UUID, cliente: ClienteRequestDTO) : Int {
+
+        val updateClienteTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+
+                var res: Int = 0
+                val cl: Optional<Cliente> = repo.findById(id)
+
+                if(cl.isPresent){
+
+                    val target: Cliente = cl.get()
+
+
+                    when{
+                        target.email != cliente.email -> {
+                            repo.saveAndFlush(Cliente(id, target.name, cliente.email, target.pass))
+                            res = 1
+                        }
+
+                        target.name != cliente.name -> {
+                            repo.saveAndFlush(Cliente(id, cliente.name, target.email, target.pass))
+                            res = 1
+                        }
+
+                        target.pass != cliente.pass -> {
+                            repo.saveAndFlush(Cliente(id, target.name, target.email, cliente.pass))
+                            res = 1
+                        }
+                        else -> res = 0
+                    }
                 }
-            } catch (e: IllegalArgumentException) {
-                res = -1
-                coroutineContext.cancel(CancellationException("Argumento não pode ser nulo", e))
-            } catch (e: NoSuchElementException) {
-                res = -1
-                coroutineContext.cancel(CancellationException("Elemento não existe na base de dados", e))
-            }
+            res
         }
 
-        scope.start()
-
-        return when {
-            scope.isCompleted -> res
-            scope.isCancelled -> res
-            else -> 0
-        }
-    }
-
-    override suspend fun updateEmail(cliente: Cliente): Int {
-        var res: Int = 0
-        val scope: Job = CoroutineScope(Dispatchers.IO).launch {
-            try {
-                if ((cliente == getByEmail(cliente.email) || cliente == getById(cliente.id!!)) && cliente.pass != repo.findById(
-                        cliente.id!!
-                    ).get().pass
-                ) {
-                    repo.save(cliente)
-                    repo.flush()
-                    res += 1
-                }
-            } catch (e: IllegalArgumentException) {
-                res = -1
-                coroutineContext.cancel(CancellationException("Argumento não pode ser nulo", e))
-            } catch (e: NoSuchElementException) {
-                res = -1
-                coroutineContext.cancel(CancellationException("Elemento não existe na base de dados", e))
-            }
-        }
-
-        scope.start()
-
-        return when {
-            scope.isCompleted -> res
-            scope.isCancelled -> res
-            else -> 0
-        }
-    }
-
-    override suspend fun updateCep(cliente: Cliente): Int {
-        var res: Int = 0
-        val scope: Job = CoroutineScope(Dispatchers.IO).launch {
-            try {
-                if ((cliente == getByEmail(cliente.email) || cliente == getById(cliente.id!!)) && cliente.pass != repo.findById(
-                        cliente.id!!
-                    ).get().pass
-                ) {
-                    repo.save(cliente)
-                    repo.flush()
-                    res += 1
-                }
-            } catch (e: IllegalArgumentException) {
-                res = -1
-                coroutineContext.cancel(CancellationException("Argumento não pode ser nulo", e))
-            } catch (e: NoSuchElementException) {
-                res = -1
-                coroutineContext.cancel(CancellationException("Elemento não existe na base de dados", e))
-            }
-        }
-
-        scope.start()
-
-        return when {
-            scope.isCompleted -> res
-            scope.isCancelled -> res
-            else -> 0
-        }
+        return updateClienteTask.await()
     }
 
 }
