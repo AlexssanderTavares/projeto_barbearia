@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS filial(
     nome TEXT NOT NULL,
     pass VARCHAR(8) NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    cnpj VARCHAR(14) UNIQUE NOT NULL,
+    cnpj VARCHAR(18) UNIQUE NOT NULL,
     qtd_profissionais INTEGER DEFAULT 0
 );
 

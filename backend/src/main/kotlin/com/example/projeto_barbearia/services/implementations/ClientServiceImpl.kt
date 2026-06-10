@@ -5,7 +5,7 @@ import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifi
 import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
 import com.example.projeto_barbearia.data.models.Cliente
-import com.example.projeto_barbearia.data.models.views.Cliente_View
+import com.example.projeto_barbearia.data.models.views.ClienteView
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo
 import com.example.projeto_barbearia.services.abstracts.ClientService
@@ -48,8 +48,9 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
             val answer: Boolean = res1.await() && res2.await()
 
-            println("Answer: ${answer}")
+            println("Created: ${answer}")
             delay(2000)
+
             if (answer) {
                 repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
                 res = 1
@@ -68,13 +69,13 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         return if (client.isPresent) client.get() else throw ClassNotFoundException("Cliente not found or doesn't exist")
     }
 
-    override suspend fun getAll(): ArrayList<Cliente_View> {
-        val retriveEveryClientsTask: Deferred<ArrayList<Cliente_View>> = CoroutineScope(Dispatchers.IO).async{
+    override suspend fun getAll(): ArrayList<ClienteView> {
+        val retriveEveryClientsTask: Deferred<ArrayList<ClienteView>> = CoroutineScope(Dispatchers.IO).async{
             println("Getting: ${viewRepo.findAll()} | with size of: ${viewRepo.findAll().size}")
             val clients = viewRepo.findAll()
-            val resList: ArrayList<Cliente_View> = arrayListOf()
+            val resList: ArrayList<ClienteView> = arrayListOf()
             clients.forEach {
-                var clientView: Cliente_View = it
+                var clientView: ClienteView = it
                 resList.add(clientView)
             }
             resList
@@ -83,11 +84,11 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         return retriveEveryClientsTask.await()
     }
 
-    override suspend fun getByEmail(email: String): Cliente_View? {
+    override suspend fun getByEmail(email: String): ClienteView? {
         println("Trying to find a register with such data...")
 
-        val searchForClientByEmailTask: Deferred<Cliente_View?> = CoroutineScope(Dispatchers.IO).async {
-            var cv: Cliente_View? = null
+        val searchForClientByEmailTask: Deferred<ClienteView?> = CoroutineScope(Dispatchers.IO).async {
+            var cv: ClienteView? = null
             getAll().forEach {
                 println(it.toString())
                 if (it.email == email) {
@@ -107,7 +108,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         val scope: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
 
             try {
-                val cliente: Cliente = getByEmail(cliente.email).let {it: Cliente_View? ->
+                val cliente: Cliente = getByEmail(cliente.email).let {it: ClienteView? ->
                     getById(it!!.id_cliente)
                 }
 
@@ -129,7 +130,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         return scope.await()
     }
 
-    override suspend fun update(id: UUID, cliente: ClienteRequestDTO) : Int {
+    override suspend fun update(id: UUID, data: ClienteRequestDTO) : Int {
 
         val updateClienteTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
 
@@ -142,18 +143,18 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
 
                     when{
-                        target.email != cliente.email -> {
-                            repo.saveAndFlush(Cliente(id, target.name, cliente.email, target.pass))
+                        target.email != data.email -> {
+                            repo.saveAndFlush(Cliente(id, target.name, data.email, target.pass))
                             res = 1
                         }
 
-                        target.name != cliente.name -> {
-                            repo.saveAndFlush(Cliente(id, cliente.name, target.email, target.pass))
+                        target.name != data.name -> {
+                            repo.saveAndFlush(Cliente(id, data.name, target.email, target.pass))
                             res = 1
                         }
 
-                        target.pass != cliente.pass -> {
-                            repo.saveAndFlush(Cliente(id, target.name, target.email, cliente.pass))
+                        target.pass != data.pass -> {
+                            repo.saveAndFlush(Cliente(id, target.name, target.email, data.pass))
                             res = 1
                         }
                         else -> res = 0

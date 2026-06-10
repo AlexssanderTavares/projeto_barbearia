@@ -3,7 +3,7 @@ package com.example.projeto_barbearia.integration.services
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
 import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
 import com.example.projeto_barbearia.data.models.Cliente
-import com.example.projeto_barbearia.data.models.views.Cliente_View
+import com.example.projeto_barbearia.data.models.views.ClienteView
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo
 import com.example.projeto_barbearia.services.implementations.ClientServiceImpl
@@ -26,7 +26,7 @@ import kotlin.test.assertNotEquals
 @SpringBootTest
 class ClienteServiceTest {
 
-    lateinit var clientService: ClientServiceImpl
+    private lateinit var clientService: ClientServiceImpl
 
     @Autowired
     lateinit var container: PostgreSQLContainer
@@ -126,7 +126,7 @@ class ClienteServiceTest {
 
     @Test
     suspend fun tryGetClienteUsingDTOandReturnAnExistingClientInDatabase() {
-        var target: Cliente_View? = null
+        var target: ClienteView? = null
         var res: Int = clientService.create(dummy)
         println("Dummy registered in database with result code: $res")
 
@@ -164,7 +164,7 @@ class ClienteServiceTest {
             println("Trying to update email...Result: ${res}")
             assertEquals(1, res , message = "Email updated..." )
 
-            val target: Cliente_View? = clientService.getByEmail("dummy_updated@test.com")
+            val target: ClienteView? = clientService.getByEmail("dummy_updated@test.com")
             assertNotEquals(null, target, "Updated data: ${target}" )
 
         } catch (e: Exception) {
@@ -182,7 +182,7 @@ class ClienteServiceTest {
             println("Trying to update name...Result: ${res}")
             assertEquals(1, res, message = "Name updated..." )
 
-            val target: Cliente_View? = clientService.getByEmail(dummy.email)
+            val target: ClienteView? = clientService.getByEmail(dummy.email)
             assertNotEquals(dummy.name, target!!.nome, "Updated data: ${target}")
 
         } catch (e: Exception) {

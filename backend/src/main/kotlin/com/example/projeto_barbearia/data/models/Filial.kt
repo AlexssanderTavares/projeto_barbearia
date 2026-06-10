@@ -16,7 +16,7 @@ data class Filial(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_filial")
-    val id: UUID,
+    val id: UUID? = null,
 
     @Column(name = "cnpj")
     val cnpj: String,
@@ -31,5 +31,5 @@ data class Filial(
     val pass: String,
 
     @Column(name = "qtd_profissionais")
-    var qt_prof: Int = 0,
+    val qt_prof: Int,
     )
