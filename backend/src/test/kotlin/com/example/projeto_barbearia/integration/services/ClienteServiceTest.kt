@@ -60,18 +60,6 @@ class ClienteServiceTest {
     }
 
     @Test
-    suspend fun tryCreateClientUsingFakeClientInstanceAndReturnSuccess() {
-            val cliente: Cliente = Cliente(id = null, name = "TesteDummy", email = "dummy@test.com", pass ="@pass123")
-            try {
-                assertEquals(1, clientService.create(ClienteRequestDTO(cliente.name, cliente.email, cliente.pass)))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                fail(e.message)
-            }
-
-    }
-
-    @Test
     suspend fun tryCreateClientUsingCreationDTOAndReturnSuccess() {
             try {
                 assertEquals(1, clientService.create(dummy))
@@ -127,12 +115,10 @@ class ClienteServiceTest {
     @Test
     suspend fun tryGetClienteUsingDTOandReturnAnExistingClientInDatabase() {
         var target: ClienteView? = null
-        var res: Int = clientService.create(dummy)
-        println("Dummy registered in database with result code: $res")
+        println("Dummy registered in database with result code: ${clientService.create(dummy) == 1}")
 
             try {
                 target = clientService.getByEmail("dummy@test.com")!!
-
             } catch (e: Exception) {
                 e.printStackTrace()
                 println(e.message)
@@ -145,7 +131,7 @@ class ClienteServiceTest {
     @Test
     suspend fun tryDeleteClienteUsingRequestDTOAndReturnSuccess() {
         try{
-            println("Creating dummy... Result code: ${clientService.create(dummy)}")
+            println("Creating dummy... Result code: ${clientService.create(dummy) == 1}")
             println("Now trying to delete it...")
             assertEquals(1, clientService.delete(dummy))
             assertEquals(null, clientService.getByEmail(dummy.email))
@@ -158,7 +144,7 @@ class ClienteServiceTest {
     @Test
     suspend fun tryUpdateClienteEmailByUsingRequestDTOAndReturnSuccess() {
         try{
-            println("Creating dummy... result code: ${clientService.create(dummy)}")
+            println("Creating dummy... result code: ${clientService.create(dummy) == 1}")
             var res: Int = clientService.update(clientService.getByEmail(dummy.email)!!.id_cliente, ClienteRequestDTO(dummy.name, "dummy_updated@test.com", dummy.pass))
 
             println("Trying to update email...Result: ${res}")
@@ -176,7 +162,7 @@ class ClienteServiceTest {
     @Test
     suspend fun tryUpdateClienteNameByUsingRequestDTOAndReturnSuccess() {
         try{
-            println("Creating dummy... result code: ${clientService.create(dummy)}")
+            println("Creating dummy... result code: ${clientService.create(dummy) == 1}")
             val res: Int = clientService.update(clientService.getByEmail(dummy.email)!!.id_cliente, ClienteRequestDTO("Updated_Dummy", dummy.email, dummy.pass))
 
             println("Trying to update name...Result: ${res}")
@@ -194,7 +180,7 @@ class ClienteServiceTest {
     @Test
     suspend fun tryUpdateClientePasswordByUsingRequestDTOAndReturnSuccess() {
         try{
-            println("Creating dummy... result code: ${clientService.create(dummy)}")
+            println("Creating dummy... result code: ${clientService.create(dummy) == 1}")
             val res: Int = clientService.update(clientService.getByEmail(dummy.email)!!.id_cliente, ClienteRequestDTO(dummy.name, dummy.email, "#Pass456"))
 
             println("Trying to update name...Result: ${res}")

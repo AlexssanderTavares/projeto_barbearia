@@ -3,6 +3,7 @@ package com.example.projeto_barbearia.integration.services
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
 import com.example.projeto_barbearia.data.dtos.filial.FilialRequestDTO
 import com.example.projeto_barbearia.data.models.Filial
+import com.example.projeto_barbearia.data.models.views.FilialView
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialViewRepository
 import com.example.projeto_barbearia.services.abstracts.FilialService
@@ -10,6 +11,7 @@ import com.example.projeto_barbearia.services.implementations.FilialServiceImpl
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -79,7 +81,90 @@ class FilialServiceTest {
             e.printStackTrace()
             fail(e.message)
         }
+    }
 
+    @Test
+    suspend fun tryGetUsingRequestDTOBusinessCodeAndReturnSuccess() {
+        var target: FilialView? = null
+
+        try{
+            println("Creating dummy: ${filialService.create(dummy)}")
+            target = filialService.getByCnpj("22.111.333/0002-66")
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        } finally {
+            println(target)
+        }
+
+        assertNotNull(target)
+    }
+
+    @Test
+    suspend fun tryGetUsingRequestDTOBusinessCodeAndReturnFailure() {
+        var target: FilialView? = null
+
+        try{
+            println("Creating dummy: ${filialService.create(dummy) == 1}")
+            target = filialService.getByCnpj("22111333000266")
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        } finally {
+            println(target)
+        }
+
+        assertEquals(null,target)
+    }
+
+    @Test
+    suspend fun tryGetUsingRequestDTOEmailAndReturnSuccess() {
+        var target: FilialView? = null
+
+        try{
+            println("Creating dummy: ${filialService.create(dummy) == 1}")
+            target = filialService.getByEmail("dummy@test.com")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        } finally {
+            println(target)
+        }
+
+        assertNotNull(target)
+    }
+
+    @Test
+    suspend fun tryGetUsingRequestDTOEmailAndReturnFailure() {
+        val target1: FilialView?
+        val target2: FilialView?
+
+        try{
+            println("Creating dummy: ${filialService.create(dummy) == 1}")
+            target1 = filialService.getByEmail("dumy@test.com")
+            target2 = filialService.getByEmail("unknown@test.com")
+
+            assertEquals(null, target1)
+            assertEquals(null, target2)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            fail(e.message)
+        }
+    }
+
+    @Test
+    suspend fun tryDeleteUsingRequestDTOAndReturnSuccess() {
+        try {
+            println("Creating dummy: ${filialService.create(dummy) == 1}")
+            assertEquals(1, filialService.delete(dummy))
+            assertEquals(null, filialService.getByCnpj(dummy.cnpj))
+            assertEquals(null, filialService.getByCnpj(dummy.email))
+        } catch(e: Exception){
+            e.printStackTrace()
+            fail(e.message)
+        }
     }
 
 }

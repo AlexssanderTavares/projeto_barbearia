@@ -10,13 +10,16 @@ import com.example.projeto_barbearia.services.utils.verifiers.BusinessCodeVerifi
 import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.Optional
 import java.util.UUID
 
 @Service
@@ -72,23 +75,77 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository, @Autowired val vi
     }
 
     override suspend fun getById(id: UUID): Filial? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getByCnpj(cnpj: String): FilialView? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getByEmail(email: String): FilialView? {
-        TODO("Not yet implemented")
+        val filial: Optional<Filial> = repo.findById(id)
+        return if (filial.isPresent) filial.get() else throw ClassNotFoundException("Filial not found")
     }
 
     override suspend fun getAll(): ArrayList<FilialView> {
-        TODO("Not yet implemented")
+        val getAllFilialTask: Deferred<ArrayList<FilialView>> = CoroutineScope(Dispatchers.IO).async {
+            val list: List<FilialView> = viewRepo.findAll()
+            println("Getting: ${list} | Size: ${list.size}")
+            val resList: ArrayList<FilialView> = arrayListOf()
+
+            list.forEach {
+                resList.add(it)
+            }
+
+            resList
+        }
+
+        return getAllFilialTask.await()
     }
 
-    override suspend fun delete(filial: Filial): Int {
-        TODO("Not yet implemented")
+    override suspend fun getByCnpj(cnpj: String): FilialView? {
+        val tryGetByBusinessCodeTaks: Deferred<FilialView?> = CoroutineScope(Dispatchers.IO).async {
+            var filial: FilialView? = null
+            viewRepo.findAll().forEach {
+                if(it.cnpj == cnpj) {
+                    filial = it
+                }
+            }
+
+            filial
+        }
+
+        return tryGetByBusinessCodeTaks.await()
+    }
+
+    override suspend fun getByEmail(email: String): FilialView? {
+        val tryGetFilialByEmailTask: Deferred<FilialView?> = CoroutineScope(Dispatchers.IO).async {
+            var filial: FilialView? = null
+            viewRepo.findAll().forEach {
+                if(it.email == email) {
+                    filial = it
+                }
+            }
+            filial
+        }
+
+        return tryGetFilialByEmailTask.await()
+    }
+
+    override suspend fun delete(filial: FilialRequestDTO): Int {
+        val deleteFilialTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+            var res: Int = 0
+            try {
+                val target: Filial = getByCnpj(filial.cnpj).let {
+                    repo.findById(it!!.id).get()
+                }
+
+                repo.delete(target)
+                res = 1
+            } catch (e: IllegalArgumentException) {
+                res = -1
+                throw CancellationException("Argumento inválido passado na chamada do método delete")
+            } catch (e: NoSuchElementException) {
+                res = -1
+                throw CancellationException("Elemento não encontrado ou não existe")
+
+            }
+             res
+        }
+
+        return deleteFilialTask.await()
     }
 
     override suspend fun update(filial: UUID, data: FilialRequestDTO): Int {

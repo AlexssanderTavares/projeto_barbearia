@@ -3,6 +3,7 @@ package com.example.projeto_barbearia.services.abstracts
 import com.example.projeto_barbearia.data.dtos.filial.FilialRequestDTO
 import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.models.views.FilialView
+import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
 import java.util.UUID
 
 interface FilialService {
@@ -17,7 +18,7 @@ interface FilialService {
 
     suspend fun getAll(): ArrayList<FilialView>
 
-    suspend fun delete(filial: Filial): Int
+    suspend fun delete(filial: FilialRequestDTO): Int
 
     suspend fun update(filial: UUID, data: FilialRequestDTO): Int
 }

@@ -71,12 +71,12 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
     override suspend fun getAll(): ArrayList<ClienteView> {
         val retriveEveryClientsTask: Deferred<ArrayList<ClienteView>> = CoroutineScope(Dispatchers.IO).async{
-            println("Getting: ${viewRepo.findAll()} | with size of: ${viewRepo.findAll().size}")
-            val clients = viewRepo.findAll()
+            val list: List<ClienteView> = viewRepo.findAll()
+            println("Getting: ${list} | with size of: ${list.size}")
+            val clients: List<ClienteView> = list
             val resList: ArrayList<ClienteView> = arrayListOf()
             clients.forEach {
-                var clientView: ClienteView = it
-                resList.add(clientView)
+                resList.add(it)
             }
             resList
         }
@@ -103,10 +103,8 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
     }
 
     override suspend fun delete(cliente: ClienteRequestDTO): Int {
-        var res: Int = 0
-
         val scope: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
-
+            var res: Int = 0
             try {
                 val cliente: Cliente = getByEmail(cliente.email).let {it: ClienteView? ->
                     getById(it!!.id_cliente)
@@ -114,7 +112,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
                 repo.delete(cliente)
                 repo.flush()
-                res += 1
+                res = 1
 
             } catch (e: IllegalArgumentException) {
                 res = -1
