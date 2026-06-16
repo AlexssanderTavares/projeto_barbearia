@@ -20,5 +20,5 @@ interface FilialService {
 
     suspend fun delete(filial: FilialRequestDTO): Int
 
-    suspend fun update(filial: UUID, data: FilialRequestDTO): Int
+    suspend fun update(id: UUID, data: FilialRequestDTO): Int
 }

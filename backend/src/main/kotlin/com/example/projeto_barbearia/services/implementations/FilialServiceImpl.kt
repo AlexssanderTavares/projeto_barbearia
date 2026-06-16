@@ -1,6 +1,7 @@
 package com.example.projeto_barbearia.services.implementations
 
 import com.example.projeto_barbearia.data.dtos.filial.FilialRequestDTO
+import com.example.projeto_barbearia.data.models.Cliente
 import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.models.views.FilialView
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
@@ -18,6 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import java.util.Optional
 import java.util.UUID
@@ -148,7 +150,63 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository, @Autowired val vi
         return deleteFilialTask.await()
     }
 
-    override suspend fun update(filial: UUID, data: FilialRequestDTO): Int {
-        TODO("Not yet implemented")
+    override suspend fun update(id: UUID, data: FilialRequestDTO): Int {
+        val updateDataTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+            var res: Int = 0
+
+            val target: Optional<Filial> = repo.findById(id)
+
+            if (target.isPresent) {
+
+                val filial: Filial = target.get()
+
+                when {
+                    target.get().email != data.email -> {
+                        repo.saveAndFlush(
+                            Filial(
+                                filial.id,
+                                filial.cnpj,
+                                filial.name,
+                                data.email,
+                                filial.pass,
+                                filial.qt_prof
+                            )
+                        )
+                        res = 1
+                    }
+
+                    target.get().qt_prof != data.qtProf -> {
+                        repo.saveAndFlush(
+                            Filial(
+                                filial.id,
+                                filial.cnpj,
+                                filial.name,
+                                filial.email,
+                                filial.pass,
+                                data.qtProf
+                            )
+                        )
+                        res = 1
+                    }
+
+                    target.get().pass != data.pass -> {
+                        repo.saveAndFlush(
+                            Filial(
+                                filial.id,
+                                filial.cnpj,
+                                filial.name,
+                                data.email,
+                                filial.pass,
+                                filial.qt_prof
+                            )
+                        )
+                        res = 1
+                    }
+                }
+            }
+            res
+        }
+
+        return updateDataTask.await()
     }
 }
