@@ -1,6 +1,6 @@
 package com.example.projeto_barbearia.services.abstracts
 
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
+import com.example.projeto_barbearia.data.dtos.cliente.requests.ClienteRequestDTO
 import com.example.projeto_barbearia.data.models.Cliente
 import com.example.projeto_barbearia.data.models.views.ClienteView
 import java.util.UUID

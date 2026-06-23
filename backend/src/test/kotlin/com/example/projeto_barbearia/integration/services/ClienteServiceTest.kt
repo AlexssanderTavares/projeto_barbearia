@@ -1,8 +1,7 @@
 package com.example.projeto_barbearia.integration.services
 
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
-import com.example.projeto_barbearia.data.models.Cliente
+import com.example.projeto_barbearia.data.dtos.cliente.requests.ClienteRequestDTO
 import com.example.projeto_barbearia.data.models.views.ClienteView
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo

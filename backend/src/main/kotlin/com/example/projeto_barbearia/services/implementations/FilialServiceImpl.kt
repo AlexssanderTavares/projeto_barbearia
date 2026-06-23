@@ -1,7 +1,6 @@
 package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.data.dtos.filial.FilialRequestDTO
-import com.example.projeto_barbearia.data.models.Cliente
+import com.example.projeto_barbearia.data.dtos.filial.requests.FilialRequestDTO
 import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.models.views.FilialView
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
@@ -16,10 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import java.util.Optional
 import java.util.UUID
@@ -64,7 +61,7 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository, @Autowired val vi
             delay(2000)
 
             if(answer){
-                repo.saveAndFlush(Filial(cnpj = filial.cnpj, name = filial.name, email = filial.email, pass = filial.pass, qt_prof = filial.qtProf))
+                repo.saveAndFlush(Filial(cnpj = filial.cnpj, name = filial.name, email = filial.email, pass = filial.pass!!, qtProf = filial.qtProf))
                 res = 1
                 res
             }else {
@@ -169,13 +166,13 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository, @Autowired val vi
                                 filial.name,
                                 data.email,
                                 filial.pass,
-                                filial.qt_prof
+                                filial.qtProf
                             )
                         )
                         res = 1
                     }
 
-                    target.get().qt_prof != data.qtProf -> {
+                    target.get().qtProf != data.qtProf -> {
                         repo.saveAndFlush(
                             Filial(
                                 filial.id,
@@ -197,7 +194,7 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository, @Autowired val vi
                                 filial.name,
                                 data.email,
                                 filial.pass,
-                                filial.qt_prof
+                                filial.qtProf
                             )
                         )
                         res = 1

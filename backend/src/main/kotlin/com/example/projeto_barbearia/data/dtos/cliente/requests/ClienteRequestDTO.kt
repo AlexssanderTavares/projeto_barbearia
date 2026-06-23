@@ -1,4 +1,4 @@
-package com.example.projeto_barbearia.data.dtos.cliente
+package com.example.projeto_barbearia.data.dtos.cliente.requests
 
 data class ClienteRequestDTO(val name: String, val email: String, val pass: String) {
 }

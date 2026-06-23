@@ -1,11 +1,15 @@
 package com.example.projeto_barbearia.data.models
 
+import com.example.projeto_barbearia.config.contracts.UserStrategy
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import java.util.UUID
 
 @Entity
@@ -18,11 +22,24 @@ data class Cliente(
     var id: UUID? = null,
 
     @Column(name = "nome")
-    val name: String,
+    override val name: String,
 
     @Column(name = "email")
-    val email: String,
+    override val email: String,
 
     @Column(name = "pass")
-    val pass: String,
-    )
+    override val pass: String,
+    ) : UserDetails, UserStrategy {
+    override fun getAuthorities(): Collection<GrantedAuthority> {
+        return listOf(SimpleGrantedAuthority("ROLE_CLIENT"))
+    }
+
+    override fun getPassword(): String? {
+        return pass
+    }
+
+    override fun getUsername(): String {
+        return email
+    }
+
+}

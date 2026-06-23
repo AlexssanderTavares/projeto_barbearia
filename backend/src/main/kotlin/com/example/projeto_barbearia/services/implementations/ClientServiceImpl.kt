@@ -1,6 +1,6 @@
 package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
+import com.example.projeto_barbearia.data.dtos.cliente.requests.ClienteRequestDTO
 import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier

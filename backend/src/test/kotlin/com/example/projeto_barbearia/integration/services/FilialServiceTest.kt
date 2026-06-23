@@ -1,15 +1,13 @@
 package com.example.projeto_barbearia.integration.services
 
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
-import com.example.projeto_barbearia.data.dtos.filial.FilialRequestDTO
-import com.example.projeto_barbearia.data.models.Filial
+import com.example.projeto_barbearia.data.dtos.filial.requests.FilialRequestDTO
 import com.example.projeto_barbearia.data.models.views.FilialView
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialViewRepository
 import com.example.projeto_barbearia.services.abstracts.FilialService
 import com.example.projeto_barbearia.services.implementations.FilialServiceImpl
 import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
