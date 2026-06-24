@@ -19,7 +19,7 @@ data class Filial(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_filial")
-    val id: UUID? = null,
+    override var id: UUID? = null,
 
     @Column(name = "cnpj")
     val cnpj: String,

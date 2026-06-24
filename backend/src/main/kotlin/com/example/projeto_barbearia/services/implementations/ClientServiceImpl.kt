@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.Optional
@@ -26,32 +28,22 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
     private lateinit var verifier: PatternVerifier
 
-    override suspend fun create(cliente: ClienteRequestDTO): Int {
+    override fun create(cliente: ClienteRequestDTO): Int {
         var res: Int = 0
-        val createClientTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+        println("Verifying email...")
+        verifier = EmailPatternVerifier()
+        val r1: Boolean = verifier.verify(cliente.email)
+        println("Email verification completion result: $r1")
 
-            val res1: Deferred<Boolean> = async {
-                println("Verifying email...")
-                verifier = EmailPatternVerifier()
-                val r1: Boolean = verifier.verify(cliente.email)
-                println("Email verification completion result: $r1")
-                r1
-            }
+        println("Verifying password...")
+        verifier = PasswordPatternVerifier()
+        val r2: Boolean = verifier.verify(cliente.pass)
+        println("Password verification completion result: $r2")
 
-            val res2: Deferred<Boolean> = async {
-                println("Verifying password...")
-                verifier = PasswordPatternVerifier()
-                val r2: Boolean = verifier.verify(cliente.pass)
-                println("Password verification completion result: $r2")
-                r2
-            }
+        val answer: Boolean = r1 && r2
+        println("Created: ${answer}")
 
-            val answer: Boolean = res1.await() && res2.await()
-
-            println("Created: ${answer}")
-            delay(2000)
-
-            if (answer) {
+        return if (answer) {
                 repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
                 res = 1
                 res
@@ -59,55 +51,47 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
                 res = -1
                 res
             }
-        }
-
-        return createClientTask.await()
     }
 
-    override suspend fun getById(id: UUID): Cliente {
+    override fun getById(id: UUID): Cliente {
         val client: Optional<Cliente> = repo.findById(id)
         return if (client.isPresent) client.get() else throw ClassNotFoundException("Cliente not found or doesn't exist")
     }
 
-    override suspend fun getAll(): ArrayList<ClienteView> {
-        val retriveEveryClientsTask: Deferred<ArrayList<ClienteView>> = CoroutineScope(Dispatchers.IO).async{
-            val list: List<ClienteView> = viewRepo.findAll()
-            println("Getting: ${list} | with size of: ${list.size}")
-            val clients: List<ClienteView> = list
-            val resList: ArrayList<ClienteView> = arrayListOf()
-            clients.forEach {
-                resList.add(it)
-            }
-            resList
+    override fun getAll(): ArrayList<Cliente> {
+
+        val list: List<Cliente> = repo.findAll()
+        println("Getting: ${list} | with size of: ${list.size}")
+        val clients: List<Cliente> = list
+        val resList: ArrayList<Cliente> = arrayListOf()
+        clients.forEach {
+            resList.add(it)
         }
 
-        return retriveEveryClientsTask.await()
+
+        return resList
     }
 
-    override suspend fun getByEmail(email: String): ClienteView? {
+    override fun getByEmail(email: String): Cliente? {
         println("Trying to find a register with such data...")
 
-        val searchForClientByEmailTask: Deferred<ClienteView?> = CoroutineScope(Dispatchers.IO).async {
-            var cv: ClienteView? = null
-            getAll().forEach {
+        var cv: Cliente? = null
+        getAll().forEach {
+            println(it.toString())
+            if (it.email == email) {
                 println(it.toString())
-                if (it.email == email) {
-                    println(it.toString())
-                    cv = it
-                }
+                cv = it
             }
-            cv
         }
 
-        return searchForClientByEmailTask.await()
+        return cv
     }
 
-    override suspend fun delete(cliente: ClienteRequestDTO): Int {
-        val scope: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+    override fun delete(cliente: ClienteRequestDTO): Int {
             var res: Int = 0
             try {
-                val cliente: Cliente = getByEmail(cliente.email).let {it: ClienteView? ->
-                    getById(it!!.id_cliente)
+                val cliente: Cliente = getByEmail(cliente.email).let {it ->
+                    getById(it!!.id!!)
                 }
 
                 repo.delete(cliente)
@@ -116,52 +100,43 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
             } catch (e: IllegalArgumentException) {
                 res = -1
-                coroutineContext.cancel(CancellationException("Argumento inválido na chamada do método delete"))
             } catch (e: NoSuchElementException) {
                 res = -1
-                coroutineContext.cancel(CancellationException("Registro não existe"))
             }
 
-            res
-        }
-
-        return scope.await()
+        return res
     }
 
-    override suspend fun update(id: UUID, data: ClienteRequestDTO) : Int {
+    override fun update(id: UUID, data: ClienteRequestDTO) : Int {
 
-        val updateClienteTask: Deferred<Int> = CoroutineScope(Dispatchers.IO).async {
+        var res: Int = 0
+        val cl: Optional<Cliente> = repo.findById(id)
 
-                var res: Int = 0
-                val cl: Optional<Cliente> = repo.findById(id)
+        if(cl.isPresent){
 
-                if(cl.isPresent){
-
-                    val target: Cliente = cl.get()
+            val target: Cliente = cl.get()
 
 
-                    when{
-                        target.email != data.email -> {
-                            repo.saveAndFlush(Cliente(id, target.name, data.email, target.pass))
-                            res = 1
-                        }
-
-                        target.name != data.name -> {
-                            repo.saveAndFlush(Cliente(id, data.name, target.email, target.pass))
-                            res = 1
-                        }
-
-                        target.pass != data.pass -> {
-                            repo.saveAndFlush(Cliente(id, target.name, target.email, data.pass))
-                            res = 1
-                        }
-                        else -> res = 0
-                    }
+            when{
+                target.email != data.email -> {
+                    repo.saveAndFlush(Cliente(id, target.name, data.email, target.pass))
+                    res = 1
                 }
-            res
+
+                target.name != data.name -> {
+                    repo.saveAndFlush(Cliente(id, data.name, target.email, target.pass))
+                    res = 1
+                }
+
+                target.pass != data.pass -> {
+                    repo.saveAndFlush(Cliente(id, target.name, target.email, data.pass))
+                    res = 1
+                }
+                else -> res = 0
+            }
         }
 
-        return updateClienteTask.await()
+        return res
     }
 
 }

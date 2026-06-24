@@ -4,7 +4,7 @@ import java.util.UUID
 
 interface UserStrategy {
 
-    val id: UUID?
+    var id: UUID?
     val name: String
     val email: String
     val pass: String

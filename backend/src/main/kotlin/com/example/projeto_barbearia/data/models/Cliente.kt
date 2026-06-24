@@ -19,7 +19,7 @@ data class Cliente(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_cliente")
-    var id: UUID? = null,
+    override var id: UUID? = null,
 
     @Column(name = "nome")
     override val name: String,

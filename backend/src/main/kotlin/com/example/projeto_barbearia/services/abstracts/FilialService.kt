@@ -7,17 +7,17 @@ import java.util.UUID
 
 interface FilialService {
 
-    suspend fun create(filial: FilialRequestDTO): Int
+    fun create(filial: FilialRequestDTO): Int
 
-    suspend fun getById(id: UUID): Filial?
+    fun getById(id: UUID): Filial?
 
-    suspend fun getByCnpj(cnpj: String): FilialView?
+    fun getByCnpj(cnpj: String): Filial?
 
-    suspend fun getByEmail(email: String): FilialView?
+    fun getByEmail(email: String): Filial?
 
-    suspend fun getAll(): ArrayList<FilialView>
+    fun getAll(): ArrayList<FilialView>
 
-    suspend fun delete(filial: FilialRequestDTO): Int
+    fun delete(filial: FilialRequestDTO): Int
 
-    suspend fun update(id: UUID, data: FilialRequestDTO): Int
+    fun update(id: UUID, data: FilialRequestDTO): Int
 }

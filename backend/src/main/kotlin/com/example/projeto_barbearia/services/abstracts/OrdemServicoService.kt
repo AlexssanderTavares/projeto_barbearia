@@ -7,13 +7,13 @@ import java.util.Optional
 
 interface OrdemServicoService {
 
-    suspend fun create(os: OrdemServico): Int
+    fun create(os: OrdemServico): Int
 
-    suspend fun getById(id: Long): Optional<OSView>
+    fun getById(id: Long): Optional<OSView>
 
-    suspend fun getAll(): List<OSView>
+    fun getAll(): List<OSView>
 
-    suspend fun delete(os: OrdemServico): Int
+    fun delete(os: OrdemServico): Int
 
-    suspend fun update(os: OrdemServico, newDate: LocalDateTime): Int
+    fun update(os: OrdemServico, newDate: LocalDateTime): Int
 }

@@ -1,5 +1,7 @@
 package com.example.projeto_barbearia.controllers
 
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -19,6 +21,7 @@ class ClientController(
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(service.create(cli))
         } catch (e: IllegalArgumentException){
+
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null)
         }
     }*/
