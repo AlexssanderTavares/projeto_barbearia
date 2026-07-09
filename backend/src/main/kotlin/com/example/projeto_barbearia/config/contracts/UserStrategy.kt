@@ -6,6 +6,7 @@ interface UserStrategy {
 
     var id: UUID?
     val name: String
+    val nationalCertificate: String?
     val email: String
     val pass: String
 }

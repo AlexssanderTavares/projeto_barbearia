@@ -1,23 +1,12 @@
 package com.example.projeto_barbearia.services.utils.verifiers
 
-class PasswordPatternVerifier: PatternVerifier {
+class PasswordPatternVerifier(): PatternVerifier {
 
     override val patterns: Set<Regex> = setOf(Regex("[!@#$%&*/\\-]"), Regex("\\w+"), Regex("\\d+"))
 
-    override fun verify(code: String?): Boolean{
-        var isValid: Boolean = false
-        if(code != null) {
-            var itContainsSymbols: Boolean = patterns.elementAt(0).containsMatchIn(code)
-            var itIsAString: Boolean = patterns.elementAt(1).containsMatchIn(code)
-            var itContainsADigitSequence: Boolean = patterns.elementAt(2).containsMatchIn(code)
-            var isLengthInRange: Boolean = code.length <= 8
-
-            if (itContainsSymbols && itIsAString && itContainsADigitSequence && isLengthInRange) {
-                isValid = true
-            }
-
-        }
-
-        return isValid
+    override fun verify(word: String): Boolean{
+        return patterns.elementAt(0).containsMatchIn(word) &&
+                patterns.elementAt(1).containsMatchIn(word) &&
+                patterns.elementAt(2).containsMatchIn(word)
     }
 }

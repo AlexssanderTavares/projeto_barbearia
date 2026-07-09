@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.util.UUID
 
@@ -22,7 +23,7 @@ data class Filial(
     override var id: UUID? = null,
 
     @Column(name = "cnpj")
-    val cnpj: String,
+    override val nationalCertificate: String? = "",
 
     @Column(name = "nome")
     override val name: String,
@@ -33,20 +34,18 @@ data class Filial(
     @Column(name = "pass")
     override val pass: String,
 
-    @Column(name = "qtd_profissionais")
-    val qtProf: Int,
     ) : UserDetails, UserStrategy{
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
-        TODO("Not yet implemented")
+        return listOf(SimpleGrantedAuthority("ROLE_CLIENT"))
     }
 
     override fun getPassword(): String? {
-        TODO("Not yet implemented")
+        return pass
     }
 
     override fun getUsername(): String {
-        TODO("Not yet implemented")
+        return email
     }
 
 }

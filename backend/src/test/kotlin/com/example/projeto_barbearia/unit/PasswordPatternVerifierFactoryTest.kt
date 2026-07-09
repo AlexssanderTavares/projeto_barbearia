@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class PasswordPatternVerifierTest {
+class PasswordPatternVerifierFactoryTest {
 
     private val verifier: PasswordPatternVerifier = PasswordPatternVerifier()
 

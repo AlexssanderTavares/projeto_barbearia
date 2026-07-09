@@ -1,35 +1,26 @@
 package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.data.dtos.cliente.requests.ClienteRequestDTO
+import com.example.projeto_barbearia.config.contracts.UserService
+import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequestDTO
+import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteCreationResponseDTO
+import com.example.projeto_barbearia.controllers.dtos.user.UserCreationRequest
+import com.example.projeto_barbearia.controllers.dtos.user.UserCreationResponse
 import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
 import com.example.projeto_barbearia.data.models.Cliente
-import com.example.projeto_barbearia.data.models.views.ClienteView
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
-import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteViewRepo
-import com.example.projeto_barbearia.services.abstracts.ClientService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.Optional
 import java.util.UUID
-import kotlin.coroutines.cancellation.CancellationException
 
 @Service
-class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowired private val viewRepo: ClienteViewRepo) : ClientService {
+class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
 
     private lateinit var verifier: PatternVerifier
 
-    override fun create(cliente: ClienteRequestDTO): Int {
-        var res: Int = 0
+    fun create(cliente: Cliente): ClienteCreationResponseDTO? {
         println("Verifying email...")
         verifier = EmailPatternVerifier()
         val r1: Boolean = verifier.verify(cliente.email)
@@ -41,24 +32,18 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         println("Password verification completion result: $r2")
 
         val answer: Boolean = r1 && r2
-        println("Created: ${answer}")
+        println("Created: $answer")
 
-        return if (answer) {
-                repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
-                res = 1
-                res
-            } else {
-                res = -1
-                res
-            }
+        repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
+        return if (answer) ClienteCreationResponseDTO(cliente.name, cliente.email, answer) else null
     }
 
-    override fun getById(id: UUID): Cliente {
+    fun getById(id: UUID): Cliente {
         val client: Optional<Cliente> = repo.findById(id)
         return if (client.isPresent) client.get() else throw ClassNotFoundException("Cliente not found or doesn't exist")
     }
 
-    override fun getAll(): ArrayList<Cliente> {
+    fun getAll(): ArrayList<Cliente> {
 
         val list: List<Cliente> = repo.findAll()
         println("Getting: ${list} | with size of: ${list.size}")
@@ -72,7 +57,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         return resList
     }
 
-    override fun getByEmail(email: String): Cliente? {
+    fun getByEmail(email: String): Cliente? {
         println("Trying to find a register with such data...")
 
         var cv: Cliente? = null
@@ -87,7 +72,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         return cv
     }
 
-    override fun delete(cliente: ClienteRequestDTO): Int {
+    fun delete(cliente: ClienteCreateRequestDTO): Int {
             var res: Int = 0
             try {
                 val cliente: Cliente = getByEmail(cliente.email).let {it ->
@@ -107,7 +92,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
         return res
     }
 
-    override fun update(id: UUID, data: ClienteRequestDTO) : Int {
+    fun update(id: UUID, data: ClienteCreateRequestDTO) : Int {
 
         var res: Int = 0
         val cl: Optional<Cliente> = repo.findById(id)
@@ -119,17 +104,17 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository, @Autowir
 
             when{
                 target.email != data.email -> {
-                    repo.saveAndFlush(Cliente(id, target.name, data.email, target.pass))
+                    repo.saveAndFlush(Cliente(id, name = target.name, email = data.email, pass = target.pass))
                     res = 1
                 }
 
                 target.name != data.name -> {
-                    repo.saveAndFlush(Cliente(id, data.name, target.email, target.pass))
+                    repo.saveAndFlush(Cliente(id, data.name, email = target.email, pass = target.pass))
                     res = 1
                 }
 
                 target.pass != data.pass -> {
-                    repo.saveAndFlush(Cliente(id, target.name, target.email, data.pass))
+                    repo.saveAndFlush(Cliente(id, target.name, email = target.email, pass = data.pass))
                     res = 1
                 }
                 else -> res = 0

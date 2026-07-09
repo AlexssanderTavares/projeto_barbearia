@@ -1,8 +1,8 @@
 package com.example.projeto_barbearia.integration.services
 
 import com.example.projeto_barbearia.config.TestcontainersConfiguration
-import com.example.projeto_barbearia.data.dtos.filial.requests.FilialRequestDTO
-import com.example.projeto_barbearia.data.models.views.FilialView
+import com.example.projeto_barbearia.controllers.dtos.filial.requests.FilialRequestDTO
+import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialViewRepository
 import com.example.projeto_barbearia.services.abstracts.FilialService
@@ -52,7 +52,7 @@ class FilialServiceTest {
 
     @Test
     fun testIfContainerIsRunning() {
-        var res = container.containerInfo
+        val res = container.containerInfo
         assertEquals(true, res.state.running)
     }
 
@@ -84,7 +84,7 @@ class FilialServiceTest {
 
     @Test
     suspend fun tryGetUsingRequestDTOBusinessCodeAndReturnSuccess() {
-        var target: FilialView? = null
+        var target: Filial? = null
 
         try{
             target = filialService.getByCnpj("22.111.333/0002-66")
@@ -101,7 +101,7 @@ class FilialServiceTest {
 
     @Test
     suspend fun tryGetUsingRequestDTOBusinessCodeAndReturnFailure() {
-        var target: FilialView? = null
+        var target: Filial? = null
 
         try{
             target = filialService.getByCnpj("22111333000266")
@@ -118,7 +118,7 @@ class FilialServiceTest {
 
     @Test
     suspend fun tryGetUsingRequestDTOEmailAndReturnSuccess() {
-        var target: FilialView? = null
+        var target: Filial? = null
 
         try{
             target = filialService.getByEmail("dummy@test.com")
@@ -134,8 +134,8 @@ class FilialServiceTest {
 
     @Test
     suspend fun tryGetUsingRequestDTOEmailAndReturnFailure() {
-        val target1: FilialView?
-        val target2: FilialView?
+        val target1: Filial?
+        val target2: Filial?
 
         try{
             target1 = filialService.getByEmail("dumy@test.com")
@@ -153,7 +153,7 @@ class FilialServiceTest {
     suspend fun tryDeleteUsingRequestDTOAndReturnSuccess() {
         try {
             assertEquals(1, filialService.delete(dummy))
-            assertEquals(null, filialService.getByCnpj(dummy.cnpj))
+            assertEquals(null, filialService.getByCnpj(dummy.cnpj!!))
             assertEquals(null, filialService.getByCnpj(dummy.email))
         } catch(e: Exception){
             e.printStackTrace()
@@ -164,12 +164,12 @@ class FilialServiceTest {
     @Test
     suspend fun tryUpdateFilialUsingRequestDTOAndReturnSuccess() {
         try{
-            val target: FilialView = filialService.getByEmail("dummy@test.com")!!
+            val target: Filial = filialService.getByEmail("dummy@test.com")!!
             println("Trying to update email...")
-            val res1: Int = filialService.update(target.id, FilialRequestDTO(target.cnpj, target.name, dummy.email, target.pass, dummy.qtProf))
+            assertEquals(1,filialService.update(target.id!!, FilialRequestDTO(target.cnpj, target.name, dummy.email, target.pass, dummy.qtProf)))
 
             println("Trying to update email...")
-            val res2: Int = filialService.update(filialService.getByEmail("dummy@test.com")!!.id, FilialRequestDTO(dummy.cnpj, dummy.name, dummy.email,dummy.pass, dummy.qtProf))
+            assertEquals(1,filialService.update(filialService.getByEmail("dummy@test.com")!!.id!!, FilialRequestDTO(dummy.cnpj, dummy.name, dummy.email,dummy.pass, dummy.qtProf)))
         } catch(e: Exception){
             e.printStackTrace()
             fail(e.message)
@@ -177,3 +177,4 @@ class FilialServiceTest {
     }
 
 }
+

@@ -2,16 +2,18 @@ package com.example.projeto_barbearia.config
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.example.projeto_barbearia.config.contracts.UserStrategy
+import com.example.projeto_barbearia.data.models.Cliente
+import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.Date
 
-class TokenConfig {
+@Component
+class ClientTokenConfig {
 
     // secret must be comprehended and switched to the right string pattern
-    private val secret: String = ""
+    private val secret: String = "secret"
 
-    fun generateToken(user: UserStrategy) : String {
+    fun generateToken(user: Cliente) : String {
         val algor: Algorithm = Algorithm.HMAC256(secret)
 
         return JWT.create()

@@ -1,0 +1,2 @@
+ALTER TABLE cliente ADD COLUMN cpf TEXT UNIQUE;
+ALTER TABLE filial DROP COLUMN qtd_profissionais CASCADE;

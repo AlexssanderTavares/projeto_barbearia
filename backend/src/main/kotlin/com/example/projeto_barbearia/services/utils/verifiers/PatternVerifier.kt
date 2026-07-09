@@ -4,5 +4,5 @@ interface PatternVerifier {
 
     val patterns: Set<Regex>
 
-    fun verify(code: String?) : Boolean
+    fun verify(word: String) : Boolean
 }

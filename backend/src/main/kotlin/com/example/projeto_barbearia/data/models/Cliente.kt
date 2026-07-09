@@ -24,11 +24,15 @@ data class Cliente(
     @Column(name = "nome")
     override val name: String,
 
+    @Column(name = "cpf")
+    override val nationalCertificate: String? = "",
+
     @Column(name = "email")
     override val email: String,
 
     @Column(name = "pass")
-    override val pass: String,
+    override val pass: String
+
     ) : UserDetails, UserStrategy {
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_CLIENT"))
