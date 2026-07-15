@@ -3,9 +3,9 @@ package com.example.projeto_barbearia.services.implementations
 import com.example.projeto_barbearia.controllers.dtos.filial.requests.FilialRequestDTO
 import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
-import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
-import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
-import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.EmailPatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.PasswordPatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.PatternVerifier
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.Optional

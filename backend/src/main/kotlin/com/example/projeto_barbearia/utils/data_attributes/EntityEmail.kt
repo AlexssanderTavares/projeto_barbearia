@@ -1,6 +1,6 @@
-package com.example.projeto_barbearia.services.utils.data_attributes
+package com.example.projeto_barbearia.utils.data_attributes
 
-import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.EmailPatternVerifier
 
 class EntityEmail(email: String) {
 

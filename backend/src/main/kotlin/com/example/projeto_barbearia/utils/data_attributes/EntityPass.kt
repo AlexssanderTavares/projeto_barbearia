@@ -1,6 +1,6 @@
-package com.example.projeto_barbearia.services.utils.data_attributes
+package com.example.projeto_barbearia.utils.data_attributes
 
-import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.PasswordPatternVerifier
 
 class EntityPass(pass: String) {
 

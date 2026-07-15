@@ -32,6 +32,10 @@ class SecurityConfig {
                 //configure routes below here
                 .requestMatchers(HttpMethod.POST, "/client/new").permitAll()
                 .requestMatchers(HttpMethod.POST, "/client/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/client/list").permitAll()
+                .requestMatchers(HttpMethod.GET, "/client/get/email").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/client/update").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/client/delete").permitAll()
                 .anyRequest().authenticated()
         }.build()
     }

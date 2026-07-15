@@ -1,13 +1,11 @@
 package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.config.contracts.UserService
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequestDTO
+import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteUpdateRequest
 import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteCreationResponseDTO
-import com.example.projeto_barbearia.controllers.dtos.user.UserCreationRequest
-import com.example.projeto_barbearia.controllers.dtos.user.UserCreationResponse
-import com.example.projeto_barbearia.services.utils.verifiers.EmailPatternVerifier
-import com.example.projeto_barbearia.services.utils.verifiers.PasswordPatternVerifier
-import com.example.projeto_barbearia.services.utils.verifiers.PatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.EmailPatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.PasswordPatternVerifier
+import com.example.projeto_barbearia.utils.verifiers.PatternVerifier
 import com.example.projeto_barbearia.data.models.Cliente
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -72,7 +70,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
         return cv
     }
 
-    fun delete(cliente: ClienteCreateRequestDTO): Int {
+    fun delete(cliente: Cliente): Int {
             var res: Int = 0
             try {
                 val cliente: Cliente = getByEmail(cliente.email).let {it ->
@@ -92,7 +90,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
         return res
     }
 
-    fun update(id: UUID, data: ClienteCreateRequestDTO) : Int {
+    fun update(id: UUID, data: ClienteUpdateRequest) : Int {
 
         var res: Int = 0
         val cl: Optional<Cliente> = repo.findById(id)
@@ -103,18 +101,18 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
 
 
             when{
-                target.email != data.email -> {
-                    repo.saveAndFlush(Cliente(id, name = target.name, email = data.email, pass = target.pass))
+                target.email != data.newEmail!! -> {
+                    repo.saveAndFlush(Cliente(id, name = target.name, email = data.newEmail, pass = target.pass))
                     res = 1
                 }
 
-                target.name != data.name -> {
+                /*target.name != data.name -> {
                     repo.saveAndFlush(Cliente(id, data.name, email = target.email, pass = target.pass))
                     res = 1
-                }
+                }*/
 
-                target.pass != data.pass -> {
-                    repo.saveAndFlush(Cliente(id, target.name, email = target.email, pass = data.pass))
+                target.pass != data.newPass -> {
+                    repo.saveAndFlush(Cliente(id, target.name, email = target.email, pass = data.newPass!!))
                     res = 1
                 }
                 else -> res = 0

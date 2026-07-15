@@ -1,4 +1,4 @@
-package com.example.projeto_barbearia.services.utils.verifiers
+package com.example.projeto_barbearia.utils.verifiers
 
 interface PatternVerifier {
 
