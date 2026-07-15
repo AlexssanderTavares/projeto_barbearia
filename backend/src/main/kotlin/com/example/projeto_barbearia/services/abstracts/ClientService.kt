@@ -1,22 +1,22 @@
 package com.example.projeto_barbearia.services.abstracts
 
-import com.example.projeto_barbearia.data.dtos.cliente.ClienteRequestDTO
+import com.example.projeto_barbearia.config.contracts.UserService
+import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequestDTO
 import com.example.projeto_barbearia.data.models.Cliente
-import com.example.projeto_barbearia.data.models.views.ClienteView
 import java.util.UUID
 
-interface ClientService {
+interface ClientService  {
 
-    suspend fun create(cliente: ClienteRequestDTO): Int
+    fun create(cliente: ClienteCreateRequestDTO): Int
 
-    suspend fun getById(id: UUID): Cliente?
+    fun getById(id: UUID): Cliente?
 
-    suspend fun getAll(): ArrayList<ClienteView>
+    fun getAll(): ArrayList<Cliente>
 
-    suspend fun getByEmail(email: String): ClienteView?
+    fun getByEmail(email: String): Cliente?
 
-    suspend fun delete(cliente: ClienteRequestDTO): Int
+    fun delete(cliente: ClienteCreateRequestDTO): Int
 
-    suspend fun update(id: UUID, data: ClienteRequestDTO): Int
+    fun update(id: UUID, data: ClienteCreateRequestDTO): Int
 
 }

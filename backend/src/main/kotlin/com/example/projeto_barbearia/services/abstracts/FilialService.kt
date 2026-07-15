@@ -1,24 +1,22 @@
 package com.example.projeto_barbearia.services.abstracts
 
-import com.example.projeto_barbearia.data.dtos.filial.FilialRequestDTO
+import com.example.projeto_barbearia.controllers.dtos.filial.requests.FilialRequestDTO
 import com.example.projeto_barbearia.data.models.Filial
-import com.example.projeto_barbearia.data.models.views.FilialView
-import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
 import java.util.UUID
 
 interface FilialService {
 
-    suspend fun create(filial: FilialRequestDTO): Int
+    fun create(filial: FilialRequestDTO): Int
 
-    suspend fun getById(id: UUID): Filial?
+    fun getById(id: UUID): Filial?
 
-    suspend fun getByCnpj(cnpj: String): FilialView?
+    fun getByCnpj(cnpj: String): Filial?
 
-    suspend fun getByEmail(email: String): FilialView?
+    fun getByEmail(email: String): Filial?
 
-    suspend fun getAll(): ArrayList<FilialView>
+    fun getAll(): ArrayList<Filial>
 
-    suspend fun delete(filial: FilialRequestDTO): Int
+    fun delete(filial: FilialRequestDTO): Int
 
-    suspend fun update(id: UUID, data: FilialRequestDTO): Int
+    fun update(id: UUID, data: FilialRequestDTO): Int
 }

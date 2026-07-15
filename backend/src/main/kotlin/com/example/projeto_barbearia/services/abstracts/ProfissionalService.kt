@@ -7,15 +7,15 @@ import java.util.UUID
 
 interface ProfissionalService {
 
-    suspend fun create(profissional: Profissional) : Int
+    fun create(profissional: Profissional) : Int
 
-    suspend fun getByEmail(email: String) : Optional<ProfissionalView>
+    fun getByEmail(email: String) : Optional<ProfissionalView>
 
-    suspend  fun getById(id: UUID) : Optional<ProfissionalView>
+    fun getById(id: UUID) : Optional<ProfissionalView>
 
-    suspend fun getAll() : List<ProfissionalView>
+    fun getAll() : List<ProfissionalView>
 
-    suspend fun delete(profissional: Profissional): Int
+    fun delete(profissional: Profissional): Int
 
-    suspend fun updateEmail(profissional: Profissional) : Int
+    fun updateEmail(profissional: Profissional) : Int
 }

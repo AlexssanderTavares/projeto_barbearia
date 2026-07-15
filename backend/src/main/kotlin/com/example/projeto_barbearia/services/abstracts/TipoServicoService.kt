@@ -6,13 +6,13 @@ import java.util.Optional
 
 interface TipoServicoService {
 
-    suspend fun create(servico: TipoServico): Int
+    fun create(servico: TipoServico): Int
 
-    suspend fun getById(id: Int) : Optional<ServicoView>
+    fun getById(id: Int) : Optional<ServicoView>
 
-    suspend fun getAll() : List<ServicoView>
+    fun getAll() : List<ServicoView>
 
-    suspend fun delete(servico: TipoServico) : Int
+    fun delete(servico: TipoServico) : Int
 
-    suspend fun update(servico: TipoServico, edit: TipoServico) : Int
+    fun update(servico: TipoServico, edit: TipoServico) : Int
 }
