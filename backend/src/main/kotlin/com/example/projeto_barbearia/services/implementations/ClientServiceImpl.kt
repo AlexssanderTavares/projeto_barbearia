@@ -1,24 +1,25 @@
 package com.example.projeto_barbearia.services.implementations
 
-import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequestDTO
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteUpdateRequest
-import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteCreationResponseDTO
+import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteCreationResponse
 import com.example.projeto_barbearia.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.utils.verifiers.PatternVerifier
 import com.example.projeto_barbearia.data.models.Cliente
 import com.example.projeto_barbearia.data.repositories.cliente_case.ClienteRepository
+import com.example.projeto_barbearia.services.abstracts.ClientService
+import com.example.projeto_barbearia.utils.tools.TimeGatherer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.Optional
 import java.util.UUID
 
 @Service
-class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
+class ClientServiceImpl(@Autowired private val repo: ClienteRepository) : ClientService {
 
     private lateinit var verifier: PatternVerifier
 
-    fun create(cliente: Cliente): ClienteCreationResponseDTO? {
+    override fun create(cliente: Cliente): ClienteCreationResponse? {
         println("Verifying email...")
         verifier = EmailPatternVerifier()
         val r1: Boolean = verifier.verify(cliente.email)
@@ -32,16 +33,20 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
         val answer: Boolean = r1 && r2
         println("Created: $answer")
 
-        repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
-        return if (answer) ClienteCreationResponseDTO(cliente.name, cliente.email, answer) else null
+        return if(answer) {
+            val res: Cliente = repo.saveAndFlush(Cliente(name = cliente.name, email = cliente.email, pass = cliente.pass))
+            ClienteCreationResponse(res.name, res.email, answer, TimeGatherer.getDateAndTime())
+        } else {
+            null
+        }
     }
 
-    fun getById(id: UUID): Cliente {
+    override fun getById(id: UUID): Cliente? {
         val client: Optional<Cliente> = repo.findById(id)
         return if (client.isPresent) client.get() else throw ClassNotFoundException("Cliente not found or doesn't exist")
     }
 
-    fun getAll(): ArrayList<Cliente> {
+    override fun getAll(): ArrayList<Cliente> {
 
         val list: List<Cliente> = repo.findAll()
         println("Getting: ${list} | with size of: ${list.size}")
@@ -55,7 +60,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
         return resList
     }
 
-    fun getByEmail(email: String): Cliente? {
+    override fun getByEmail(email: String): Cliente? {
         println("Trying to find a register with such data...")
 
         var cv: Cliente? = null
@@ -70,10 +75,10 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
         return cv
     }
 
-    fun delete(cliente: Cliente): Int {
+    override fun delete(cliente: Cliente): Int {
             var res: Int = 0
             try {
-                val cliente: Cliente = getByEmail(cliente.email).let {it ->
+                val cliente: Cliente? = getByEmail(cliente.email).let {it ->
                     getById(it!!.id!!)
                 }
 
@@ -90,7 +95,7 @@ class ClientServiceImpl(@Autowired private val repo: ClienteRepository) {
         return res
     }
 
-    fun update(id: UUID, data: ClienteUpdateRequest) : Int {
+    override fun update(id: UUID, data: ClienteUpdateRequest) : Int {
 
         var res: Int = 0
         val cl: Optional<Cliente> = repo.findById(id)

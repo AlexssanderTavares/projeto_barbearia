@@ -36,6 +36,8 @@ class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/client/get/email").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/client/update").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/client/delete").permitAll()
+                .requestMatchers(HttpMethod.POST, "/business/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/business/signin").permitAll()
                 .anyRequest().authenticated()
         }.build()
     }

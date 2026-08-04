@@ -37,7 +37,7 @@ data class Filial(
     ) : UserDetails, UserStrategy{
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
-        return listOf(SimpleGrantedAuthority("ROLE_CLIENT"))
+        return listOf(SimpleGrantedAuthority("ROLE_BUSINESS"))
     }
 
     override fun getPassword(): String? {

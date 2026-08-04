@@ -1,4 +1,4 @@
 package com.example.projeto_barbearia.controllers.dtos.login
 
-class LoginRequest(val email: String, val pass: String) {
+data class LoginRequest(val email: String, val pass: String) {
 }

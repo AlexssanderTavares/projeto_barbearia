@@ -87,7 +87,7 @@ class FilialServiceTest {
         var target: Filial? = null
 
         try{
-            target = filialService.getByCnpj("22.111.333/0002-66")
+            target = filialService.getByNationalCertificate("22.111.333/0002-66")
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -104,7 +104,7 @@ class FilialServiceTest {
         var target: Filial? = null
 
         try{
-            target = filialService.getByCnpj("22111333000266")
+            target = filialService.getByNationalCertificate("22111333000266")
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -153,8 +153,8 @@ class FilialServiceTest {
     suspend fun tryDeleteUsingRequestDTOAndReturnSuccess() {
         try {
             assertEquals(1, filialService.delete(dummy))
-            assertEquals(null, filialService.getByCnpj(dummy.cnpj!!))
-            assertEquals(null, filialService.getByCnpj(dummy.email))
+            assertEquals(null, filialService.getByNationalCertificate(dummy.cnpj!!))
+            assertEquals(null, filialService.getByNationalCertificate(dummy.email))
         } catch(e: Exception){
             e.printStackTrace()
             fail(e.message)

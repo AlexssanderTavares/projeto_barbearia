@@ -34,6 +34,7 @@ data class Cliente(
     override val pass: String
 
     ) : UserDetails, UserStrategy {
+
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_CLIENT"))
     }

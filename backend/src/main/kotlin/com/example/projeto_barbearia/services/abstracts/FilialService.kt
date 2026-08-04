@@ -10,7 +10,7 @@ interface FilialService {
 
     fun getById(id: UUID): Filial?
 
-    fun getByCnpj(cnpj: String): Filial?
+    fun getByNationalCertificate(certificate: String): Filial?
 
     fun getByEmail(email: String): Filial?
 

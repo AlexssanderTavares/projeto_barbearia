@@ -1,8 +1,11 @@
 package com.example.projeto_barbearia.services.implementations
 
 import com.example.projeto_barbearia.controllers.dtos.filial.requests.FilialRequestDTO
+import com.example.projeto_barbearia.controllers.dtos.filial.response.FilialCreateResponse
 import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
+import com.example.projeto_barbearia.utils.tools.TimeGatherer
+import com.example.projeto_barbearia.utils.verifiers.BusinessCodeVerifier
 import com.example.projeto_barbearia.utils.verifiers.EmailPatternVerifier
 import com.example.projeto_barbearia.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.utils.verifiers.PatternVerifier
@@ -16,35 +19,32 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository){
 
     private lateinit var verifier: PatternVerifier
 
-    fun create(filial: FilialRequestDTO): Int {
-        var res: Int = 0
+    fun create(filial: Filial): FilialCreateResponse? {
 
         println("Verifying email...")
         verifier = EmailPatternVerifier()
         val taskResult1: Boolean = verifier.verify(filial.email)
-        println("Verified email: ${taskResult1}")
+        println("Verified email: $taskResult1")
 
         println("Verifying pass...")
         verifier = PasswordPatternVerifier()
-        val taskResult2: Boolean = verifier.verify(filial.pass!!)
-        println("Verified pass: ${taskResult2}")
+        val taskResult2: Boolean = verifier.verify(filial.pass)
+        println("Verified pass: $taskResult2")
 
-        /*println("Verifying Business Code...")
+        println("Verifying Business Code...")
         verifier = BusinessCodeVerifier()
-        val taskResult3: Boolean = verifier.verify(filial.cnpj!!)
-        println("Verified code: ${taskResult3}")*/
+        val taskResult3: Boolean = verifier.verify(filial.nationalCertificate!!)
+        println("Verified code: $taskResult3")
 
-        val answer: Boolean = taskResult1 && taskResult2 // && taskResult3
+        val answer: Boolean = taskResult1 && taskResult2 && taskResult3
 
-        println("Created: ${answer}")
+        println("Created: $answer")
 
         return if(answer){
-            repo.saveAndFlush(Filial(nationalCertificate = filial.cnpj, name = filial.name, email = filial.email, pass = filial.pass))
-            res = 1
-            res
+            val newFilial: Filial = repo.saveAndFlush(Filial(nationalCertificate = filial.nationalCertificate, name = filial.name, email = filial.email, pass = filial.pass))
+            FilialCreateResponse(newFilial.name, newFilial.email, answer, TimeGatherer.getDateAndTime())
         }else {
-            res = -1
-            res
+            null
         }
     }
 

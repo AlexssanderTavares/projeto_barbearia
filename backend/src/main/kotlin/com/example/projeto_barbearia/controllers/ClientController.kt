@@ -1,10 +1,10 @@
 package com.example.projeto_barbearia.controllers
 
 import com.example.projeto_barbearia.config.ClientTokenConfig
-import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequestDTO
+import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequest
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteGetRequest
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteUpdateWrapper
-import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteCreationResponseDTO
+import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteCreationResponse
 import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteDeleteResponse
 import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteGetResponse
 import com.example.projeto_barbearia.controllers.dtos.cliente.response.ClienteUpdateResponse
@@ -37,9 +37,9 @@ class ClientController(
 ) {
 
     @PostMapping("/new")
-    fun createClient(@RequestBody dto: ClienteCreateRequestDTO): ResponseEntity<ClienteCreationResponseDTO> {
+    fun createClient(@RequestBody dto: ClienteCreateRequest): ResponseEntity<ClienteCreationResponse> {
         val cliente: Cliente = Cliente(name = dto.name, email = dto.email, pass = encoder.encode(dto.pass)!!)
-        val res: ClienteCreationResponseDTO? = service.create(cliente)
+        val res: ClienteCreationResponse? = service.create(cliente)
         return if (res != null) ResponseEntity.status(HttpStatus.CREATED).body(res) else ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
     }
 
@@ -49,7 +49,7 @@ class ClientController(
         val auth = authManager.authenticate(authToken)
 
         val token: String = tokenConfig.generateToken(auth.principal as Cliente)
-        return ResponseEntity.status(HttpStatus.OK).body(LoginResponse(token))
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(LoginResponse(token))
     }
 
     @GetMapping("/list")
