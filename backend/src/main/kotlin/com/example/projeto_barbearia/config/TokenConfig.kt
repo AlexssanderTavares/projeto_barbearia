@@ -2,22 +2,22 @@ package com.example.projeto_barbearia.config
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.example.projeto_barbearia.data.models.Filial
+import com.example.projeto_barbearia.config.contracts.UserStrategy
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.Date
 
 @Component
-class FilialTokenConfig {
+class TokenConfig {
 
     private val secret: String = "secret"
 
-    fun generateToken(filial: Filial) : String {
+    fun generateToken(user: UserStrategy): String {
         val algor: Algorithm = Algorithm.HMAC256(secret)
 
         return JWT.create()
-            .withClaim("id", filial.id?.toString())
-            .withSubject(filial.email)
+            .withClaim("id", user.id?.toString())
+            .withSubject(user.email)
             .withExpiresAt(Date.from(Instant.now().plusSeconds(86400L)))
             .withIssuedAt(Instant.now())
             .sign(algor)

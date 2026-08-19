@@ -10,4 +10,6 @@ import java.util.UUID
 interface ClienteRepository : JpaRepository<Cliente, UUID> {
 
     fun findByEmail(email: String): Optional<Cliente>
+
+    fun findByNationalCertificate(certificate: String): Optional<Cliente>
 }

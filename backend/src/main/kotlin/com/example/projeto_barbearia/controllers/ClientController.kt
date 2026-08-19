@@ -1,6 +1,6 @@
 package com.example.projeto_barbearia.controllers
 
-import com.example.projeto_barbearia.config.ClientTokenConfig
+import com.example.projeto_barbearia.config.contracts.UserStrategy
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteCreateRequest
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteGetRequest
 import com.example.projeto_barbearia.controllers.dtos.cliente.requests.ClienteUpdateWrapper
@@ -32,13 +32,13 @@ import org.springframework.web.bind.annotation.RestController
 class ClientController(
     @Autowired private val service : ClientServiceImpl,
     @Autowired private val encoder : PasswordEncoder,
-    @Autowired private val tokenConfig: ClientTokenConfig,
+    //@Autowired private val tokenConfig: ClientTokenConfig,
     private val authManager: AuthenticationManager
 ) {
-
+/*
     @PostMapping("/new")
     fun createClient(@RequestBody dto: ClienteCreateRequest): ResponseEntity<ClienteCreationResponse> {
-        val cliente: Cliente = Cliente(name = dto.name, email = dto.email, pass = encoder.encode(dto.pass)!!)
+        val cliente: UserStrategy = Cliente(name = dto.name, email = dto.email, pass = encoder.encode(dto.pass)!!)
         val res: ClienteCreationResponse? = service.create(cliente)
         return if (res != null) ResponseEntity.status(HttpStatus.CREATED).body(res) else ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
     }
@@ -78,5 +78,5 @@ class ClientController(
         val user: Cliente = service.getByEmail(cliente.email!!) ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ClienteDeleteResponse(false, TimeGatherer.getDateAndTime()))
         val res: ClienteDeleteResponse = ClienteDeleteResponse(service.delete(user) != 0, TimeGatherer.getDateAndTime())
         return ResponseEntity.status(HttpStatus.OK).body(res)
-    }
+    }*/
 }

@@ -33,7 +33,7 @@ data class Cliente(
     @Column(name = "pass")
     override val pass: String
 
-    ) : UserDetails, UserStrategy {
+    ) : UserStrategy, UserDetails  {
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_CLIENT"))

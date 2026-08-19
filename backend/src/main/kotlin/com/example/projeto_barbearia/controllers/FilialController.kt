@@ -1,6 +1,6 @@
 package com.example.projeto_barbearia.controllers
 
-import com.example.projeto_barbearia.config.FilialTokenConfig
+import com.example.projeto_barbearia.config.TokenConfig
 import com.example.projeto_barbearia.controllers.dtos.filial.requests.FilialCreateRequest
 import com.example.projeto_barbearia.controllers.dtos.filial.response.FilialCreateResponse
 import com.example.projeto_barbearia.controllers.dtos.login.LoginRequest
@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -25,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController
 class FilialController(
     @Autowired private val service: FilialServiceImpl,
     @Autowired private val encoder: PasswordEncoder,
-    @Autowired private val tokenConfig: FilialTokenConfig,
+    @Autowired private val tokenConfig: TokenConfig,
     private val authManager: AuthenticationManager
     ) {
-
+/*
     @PostMapping("/register")
     fun createBusiness(@RequestBody business: FilialCreateRequest) : ResponseEntity<FilialCreateResponse>{
         val newFilial: Filial = Filial(nationalCertificate = business.businessCode, name = business.name, email = business.email, pass = encoder.encode(business.pass)!!)
@@ -49,5 +48,5 @@ class FilialController(
 
         val token: String = tokenConfig.generateToken(auth.principal as Filial)
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(LoginResponse(token))
-    }
+    }*/
 }

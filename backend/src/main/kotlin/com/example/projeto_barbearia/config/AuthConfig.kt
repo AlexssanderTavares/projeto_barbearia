@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class ClientAuthConfig(@Autowired private val clientRepo: ClienteRepository, @Autowired private val busiRepo: FilialRepository) : UserDetailsService {
+class AuthConfig(@Autowired private val clientRepo: ClienteRepository, @Autowired private val busiRepo: FilialRepository) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
         val client: Cliente = clientRepo.findByEmail(username).get()

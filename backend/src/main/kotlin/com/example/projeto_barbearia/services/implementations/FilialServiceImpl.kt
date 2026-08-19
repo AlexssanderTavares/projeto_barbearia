@@ -1,7 +1,11 @@
 package com.example.projeto_barbearia.services.implementations
 
+import com.example.projeto_barbearia.config.contracts.UserService
+import com.example.projeto_barbearia.config.contracts.UserStrategy
 import com.example.projeto_barbearia.controllers.dtos.filial.requests.FilialRequestDTO
 import com.example.projeto_barbearia.controllers.dtos.filial.response.FilialCreateResponse
+import com.example.projeto_barbearia.controllers.dtos.user.UserCreationResponse
+import com.example.projeto_barbearia.controllers.dtos.user.UserUpdateRequest
 import com.example.projeto_barbearia.data.models.Filial
 import com.example.projeto_barbearia.data.repositories.filial_case.FilialRepository
 import com.example.projeto_barbearia.utils.tools.TimeGatherer
@@ -11,53 +15,57 @@ import com.example.projeto_barbearia.utils.verifiers.PasswordPatternVerifier
 import com.example.projeto_barbearia.utils.verifiers.PatternVerifier
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.security.cert.Certificate
 import java.util.Optional
 import java.util.UUID
 
 @Service
-class FilialServiceImpl(@Autowired val repo: FilialRepository){
+class FilialServiceImpl(@Autowired private val repo: FilialRepository) : UserService{
 
     private lateinit var verifier: PatternVerifier
 
-    fun create(filial: Filial): FilialCreateResponse? {
+    override fun create(user: UserStrategy): UserCreationResponse? {
+        println("Verifying type...")
+        val taskResult0: Boolean = user is Filial
 
         println("Verifying email...")
         verifier = EmailPatternVerifier()
-        val taskResult1: Boolean = verifier.verify(filial.email)
+        val taskResult1: Boolean = verifier.verify(user.email)
         println("Verified email: $taskResult1")
 
         println("Verifying pass...")
         verifier = PasswordPatternVerifier()
-        val taskResult2: Boolean = verifier.verify(filial.pass)
+        val taskResult2: Boolean = verifier.verify(user.pass)
         println("Verified pass: $taskResult2")
 
         println("Verifying Business Code...")
         verifier = BusinessCodeVerifier()
-        val taskResult3: Boolean = verifier.verify(filial.nationalCertificate!!)
+        val taskResult3: Boolean = verifier.verify(user.nationalCertificate!!)
         println("Verified code: $taskResult3")
 
-        val answer: Boolean = taskResult1 && taskResult2 && taskResult3
+        val answer: Boolean = taskResult0 && taskResult1 && taskResult2 //&& taskResult3
 
-        println("Created: $answer")
+
 
         return if(answer){
-            val newFilial: Filial = repo.saveAndFlush(Filial(nationalCertificate = filial.nationalCertificate, name = filial.name, email = filial.email, pass = filial.pass))
-            FilialCreateResponse(newFilial.name, newFilial.email, answer, TimeGatherer.getDateAndTime())
+            val newFilial: Filial = repo.saveAndFlush(Filial(nationalCertificate = user.nationalCertificate, name = user.name, email = user.email, pass = user.pass))
+            println("Created: $answer")
+            UserCreationResponse(newFilial.name,answer,TimeGatherer.getDateAndTime())
         }else {
             null
         }
     }
 
-    fun getById(id: UUID): Filial? {
+    override fun getById(id: UUID): Filial? {
         val filial: Optional<Filial> = repo.findById(id)
         return if (filial.isPresent) filial.get() else throw ClassNotFoundException("Filial not found")
     }
 
-    fun getAll(): ArrayList<Filial> {
+    override fun getAll(): ArrayList<UserStrategy> {
 
         val list: List<Filial> =repo.findAll()
         println("Getting: ${list} | Size: ${list.size}")
-        val resList: ArrayList<Filial> = arrayListOf()
+        val resList: ArrayList<UserStrategy> = arrayListOf()
 
         list.forEach {
             resList.add(it)
@@ -66,11 +74,11 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository){
         return resList
     }
 
-    fun getByCnpj(cnpj: String): Filial? {
+    override fun getByNationalCertificate(certificate: String): Filial? {
 
         var filial: Filial? = null
         repo.findAll().forEach {
-            if(it.nationalCertificate == cnpj) {
+            if(it.nationalCertificate == certificate) {
                 filial = it
             }
         }
@@ -78,7 +86,7 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository){
         return filial
     }
 
-    fun getByEmail(email: String): Filial? {
+    override fun getByEmail(email: String): Filial? {
 
         var filial: Filial? = null
         repo.findAll().forEach {
@@ -90,11 +98,11 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository){
         return filial
     }
 
-    fun delete(filial: FilialRequestDTO): Int {
+    override fun delete(user: UserStrategy): Int {
 
         var res: Int = 0
         try {
-            val target: Filial = getByCnpj(filial.cnpj!!).let {
+            val target: Filial = getByNationalCertificate(user.nationalCertificate!!).let {
                 repo.findById(it!!.id!!).get()
             }
 
@@ -109,44 +117,39 @@ class FilialServiceImpl(@Autowired val repo: FilialRepository){
         return res
     }
 
-    fun update(id: UUID, data: FilialRequestDTO): Int {
+    override fun update(id: UUID, data: UserUpdateRequest): Int {
 
-            var res: Int = 0
+        var res: Int = 0
 
-            val target: Optional<Filial> = repo.findById(id)
+        val target: Optional<Filial> = repo.findById(id)
 
-            if (target.isPresent) {
+        val filial: Filial = if (target.isPresent) target.get() else throw ClassNotFoundException("Filial not found")
 
-                val filial: Filial = target.get()
+        if(target.get().email != data.newEmail) {
+            repo.saveAndFlush(
+                Filial(
+                    filial.id,
+                    filial.nationalCertificate,
+                    filial.name,
+                    data.newEmail!!,
+                    filial.pass
+                )
+            )
+            res = 1
+        }
 
-                when {
-                    target.get().email != data.email -> {
-                        repo.saveAndFlush(
-                            Filial(
-                                filial.id,
-                                filial.nationalCertificate,
-                                filial.name,
-                                data.email,
-                                filial.pass
-                            )
-                        )
-                        res = 1
-                    }
-
-                    target.get().pass != data.pass -> {
-                        repo.saveAndFlush(
-                            Filial(
-                                filial.id,
-                                filial.nationalCertificate,
-                                filial.name,
-                                data.email,
-                                filial.pass
-                            )
-                        )
-                        res = 1
-                    }
-                }
-            }
+        if(target.get().pass != data.newPass) {
+            repo.saveAndFlush(
+                Filial(
+                    filial.id,
+                    filial.nationalCertificate,
+                    filial.name,
+                    filial.email,
+                    data.newPass!!
+                )
+            )
+            res = 1
+        }
 
         return res
     }

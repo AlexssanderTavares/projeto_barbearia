@@ -13,7 +13,7 @@ interface ClientService  {
 
     fun getById(id: UUID): Cliente?
 
-    fun getByNationalCertificate(certificate: String): Filial?
+    fun getByNationalCertificate(certificate: String): Cliente?
 
     fun getAll(): ArrayList<Cliente>
 

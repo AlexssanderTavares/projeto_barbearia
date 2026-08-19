@@ -30,6 +30,8 @@ class SecurityConfig {
         }.authorizeHttpRequests {
             it.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 //configure routes below here
+                .requestMatchers(HttpMethod.POST, "/auth/new").permitAll()
+                .requestMatchers(HttpMethod.GET, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/client/new").permitAll()
                 .requestMatchers(HttpMethod.POST, "/client/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/client/list").permitAll()
